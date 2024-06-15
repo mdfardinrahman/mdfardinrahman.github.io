@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Fardin's Portfolio</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+  <script>
+    document.querySelectorAll('.project-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const languages = item.querySelector('.project-languages');
+        languages.style.display = languages.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+  </script>
+  
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: DevFolio
+  * Template URL: https://bootstrapmade.com/devfolio-bootstrap-portfolio-html-template/
+  * Updated: Jun 14 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1 class="sitename">FARDIN's</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="#hero" class="active">Home<br></a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#resume">Resume</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <!-- <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="#">Dropdown 1</a></li>
+              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="#">Deep Dropdown 1</a></li>
+                  <li><a href="#">Deep Dropdown 2</a></li>
+                  <li><a href="#">Deep Dropdown 3</a></li>
+                  <li><a href="#">Deep Dropdown 4</a></li>
+                  <li><a href="#">Deep Dropdown 5</a></li>
+                </ul>
+              </li>
+              <li><a href="#">Dropdown 2</a></li>
+              <li><a href="#">Dropdown 3</a></li>
+              <li><a href="#">Dropdown 4</a></li>
+            </ul>
+          </li> -->
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
+
+      <img src="assets/img/hero-img.jpg" alt="" data-aos="fade-in">
+
+      <div class="container d-flex flex-column align-items-center justify-content-center text-center" data-aos="fade-up" data-aos-delay="100">
+        <h2>I am Fardin Rahman</h2>
+        <p><span class="typed" data-typed-items="CSE Graduate, Lecturer, Ai Enthusiast, Fun Guy"></span></p>
+      </div>
+
+    </section><!-- /Hero Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4">
+          <div class="col-md-6">
+
+            <div class="row justify-content-between gy-4">
+              <div class="col-lg-5">
+                <img src="assets/img/profile-img.jpg" class="img-fluid" alt="">
+              </div>
+              <div class="col-lg-7 about-info">
+                <p><strong>Name: </strong> <span>Md Fardin Rahman Ami</span></p>
+                <p><strong>Profile: </strong> <span>Adjunct Lecturer</span></p>
+                <p><strong>Email: </strong> <span>mdfardinrahman@gmail.com</span></p>
+                <p><strong>Office Email: </strong> <span>ext.fardin.rahman@bracu.ac.bd</span></p>
+                <p><strong>Find me @</strong> <a href="https://cse.sds.bracu.ac.bd/faculty_profile/317/mr_md_fardin_rahman_ami#Biography">BracU CSE</a></p>
+
+              </div>
+
+            </div>
+
+            <div class="skills-content skills-animation">
+
+              <h5>Skills</h5>
+
+              <div class="progress">
+                <span class="skill"><span>Python and Java programming</span> <i class="val">90%</i></span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div><!-- End Skills Item -->
+              <div class="progress">
+                <span class="skill"><span>research and development</span> <i class="val">60%</i></span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div><!-- End Skills Item -->
+              <div class="progress">
+                <span class="skill"><span>Framework development</span> <i class="val">60%</i></span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div><!-- End Skills Item -->
+
+              <div class="progress">
+                <span class="skill"><span>Ai and ML</span> <i class="val">65%</i></span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div><!-- End Skills Item -->
+
+              <div class="progress">
+                <span class="skill"><span>DBMS</span> <i class="val">90%</i></span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div><!-- End Skills Item -->
+
+
+            </div>
+
+          </div>
+          <div class="col-md-6">
+            <div class="about-me">
+              <h4>About me</h4>
+              <p>
+                
+              A person with quite much optimism and positivity. Strongly believe in passion and hard work. Engaging with people and solving daily life problems in an effective way gives me pleasure. 
+              In search of a better version of myself and to grow in such a way that it directly or indirectly contributes to the growth of my family, my surroundings, and my nation.
+              </p>
+              <p>
+                <b>Md Fardin Rahman Ami</b> is currently working as an adjunct lecturer in the Department of Computer Science and Engineering at BRAC University. He earned his undergraduate degree in Computer Science and Engineering from BRAC University in 2023. During his undergraduate studies, he worked as a Student Tutor (Teaching Assistant) in the Computer Science and Engineering department for five consecutive semesters. Besides he participated in various programming contests multiple of times.
+
+ 
+              </p>
+              <p>
+              Fardin is committed to continuous learning and expanding his knowledge everyday. 
+              His primary research interests lie in the fields of <b><i>Natural Language Processing, Computer Vision, 
+                Deep Learning and Machine Learning.</i></b>
+
+              </p>
+              <p>
+                In his leisure time, Fardin enjoys traveling, playing outdoor games, and notably sleeping zzz! 
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /About Section -->
+
+<!-- Resume Section -->
+<section id="resume" class="resume section">
+
+  <!-- Section Title -->
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Resume</h2>
+    <p>Explore my academic and professional achievements in Computer Science and Engineering.<br>
+      <p>
+        <a href="https://drive.google.com/file/d/1LPlHyYGuOtXjX6VnqHSGU2esNCPsRHO8/view" target="_blank">
+          Resume or CV <i class="bi bi-file-earmark-text"></i>
+        </a>
+      </p>
+      
+  </div><!-- End Section Title -->
+
+  <div class="container">
+
+    <div class="row">
+
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+        <h3 class="resume-title" style="color: #4d55eb;">Summary</h3>
+        <div class="resume-item pb-0">
+          <h4 style="color: #1f1d1d;">Md Fardin Rahman Ami</h4>
+          <p><em>Experienced Adjunct Lecturer in Computer Science with a strong educational background and a passion for teaching and technology.</em></p>
+          <ul>
+            <li>Optimistic and Passionate</li>
+            <li>Self-motivated</li>
+            <li>CS and Research enthusiast</li>
+          </ul>
+        </div><!-- End Resume Item -->
+
+        <h3 class="resume-title" style="color: #4d55eb;">Education</h3>
+        <!-- B.Sc. in Computer Science & Engineering -->
+        <div class="resume-item">
+          <h5>2020 - 2023</h5>
+          <h4 style="color: #1f1d1d;">B.Sc. in Computer Science & Engineering</h4>
+          <p><em>BRAC University, Dhaka, Bangladesh</em></p>
+          <p><em>CGPA: 3.94/4.00</em></p>
+          <p>Graduated with high honors, achieving excellent academic results.</p>
+        </div><!-- End Resume Item -->
+
+        <!-- Higher Secondary School Certificate, Science -->
+        <div class="resume-item">
+          <h5>2017 - 2019</h5>
+          <h4 style="color: #1f1d1d;">Higher Secondary School Certificate, Science</h4>
+          <p><em>Adamjee Cantonment College, Dhaka, Bangladesh</em></p>
+          <p><em>GPA: 5.00/5.00</em></p>
+          <p>Excelled in rigorous science curriculum, preparing effectively for tertiary education.</p>
+        </div><!-- End Resume Item -->
+
+        <!-- Secondary School Certificate, Science -->
+        <div class="resume-item">
+          <h5>2007 - 2017</h5>
+          <h4 style="color: #1f1d1d;">Secondary School Certificate, Science</h4>
+          <p><em>Monipur High School, Dhaka, Bangladesh</em></p>
+          <p><em>GPA: 5.00/5.00</em></p>
+          <p>Displayed strong aptitude in science subjects, setting a solid foundation for future studies.</p>
+        </div><!-- End Resume Item -->
+
+      </div>
+
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+        <h3 class="resume-title" style="color: #4d55eb;">Professional Experience</h3>
+        <!-- Adjunct Lecturer -->
+        <div class="resume-item">
+          <h5>May 2024 - Present</h5>
+          <h4 style="color: #1f1d1d;">Adjunct Lecturer</h4>
+          <p><em>at Computer Science & Engineering Dept, BRAC University</em></p>
+          <ul>
+            <li>Taught courses such as CSE331 Automata and Computability and CSE111 Programming Language II - Java OOPs.</li>
+            <li>Developed course materials and assessments aligning with academic standards.</li>
+          </ul>
+        </div><!-- End Resume Item -->
+
+        <!-- Student Tutor/Teaching Assistant -->
+        <div class="resume-item">
+          <h5>September 2022 - April 2024</h5>
+          <h4 style="color: #1f1d1d;">Student Tutor/Teaching Assistant</h4>
+          <p><em>at Computer Science & Engineering Dept, BRAC University</em></p>
+          <ul>
+            <li>Assisted in courses like Programming Language I - Python and Discrete Mathematics.</li>
+            <li>Provided support to students in understanding complex concepts and problem-solving.</li>
+          </ul>
+        </div><!-- End Resume Item -->
+
+          <!-- General Member -->
+          <div class="resume-item">
+            <h5>2020</h5>
+            <h4 style="color: #1f1d1d;">General Member</h4>
+            <p><em>at Club of BRAC University - ROBU</em></p>
+            <ul>
+              <li>Engaged in collaborative projects and competitions enhancing robotics skills and knowledge.</li>
+            </ul>
+          </div><!-- End Resume Item -->
+
+
+            <!-- Volunteer -->
+        <div class="resume-item">
+          <h5>2019</h5>
+          <h4 style="color: #1f1d1d;">Volunteer</h4>
+          <p><em>at Adamjee Cantonment College Mega Fest Carnival</em></p>
+          <ul>
+            <li>Contributed to the planning and execution of large-scale college events, enhancing community spirit.</li>
+          </ul>
+        </div><!-- End Resume Item -->
+
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section><!-- /Resume Section -->
+
+
+
+
+
+  <!-- Projects Section -->
+<section id="projects" class="projects section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Projects</h2>
+    <p>Tried to showcase a strong proficiency in a variety of programming languages and frameworks.<br>Highlighting my ability 
+      to apply complex technologies to real-world problems in web development, machine learning and data analysis.</p>
+  </div><!-- End Section Title -->
+
+  <div class="container">
+
+    <div class="row gy-4">
+
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="content px-xl-5">
+          <h3><span>Demo </span><strong>Projects</strong></h3>
+          <p>
+            My projects are mostly includes academical demo web development projects and 
+            some Machine Learning and Artificial Intelligence projects. Few includes Data Analysis 
+            and visualizer projects.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+
+        <div class="project-container">
+          <!-- Post-Grad Grooming Platform Webapp -->
+          <div class="project-item">
+            <h4>Post-Grad Grooming Platform Webapp</h4>
+            <div class="project-languages" style="display:none;">
+              <p>Languages and Technologies: Flask, HTML5, CSS3, Bootstrap5, MySQL</p>
+            </div>
+          </div><!-- End Project item-->
+
+          <!-- Hotel review analysis -->
+          <div class="project-item">
+            <h4>Hotel review analysis and classification using machine learning</h4>
+            <div class="project-languages" style="display:none;">
+              <p>Languages and Technologies: NLP, Machine Learning, Deep Learning, Data Analysis</p>
+            </div>
+          </div><!-- End Project item-->
+
+          <!-- Human stress detection -->
+          <div class="project-item">
+            <h4>Human stress detection from raw posts and comments</h4>
+            <div class="project-languages" style="display:none;">
+              <p>Languages and Technologies: NLP, Deep Learning, Neural Networks, Machine Learning</p>
+            </div>
+          </div><!-- End Project item-->
+
+          <!-- Football penalty shoot game -->
+          <div class="project-item">
+            <h4>A Football penalty shoot game with a random bot goalkeeper</h4>
+            <div class="project-languages" style="display:none;">
+              <p>Languages and Technologies: Python (Numpy, OpenGL, Random, Time)</p>
+            </div>
+          </div><!-- End Project item-->
+
+          <!-- Tracking Hotel room -->
+          <div class="project-item">
+            <h4>Tracking Hotel room, Customers, and payment status</h4>
+            <div class="project-languages" style="display:none;">
+              <p>Languages and Technologies: HTML5, CSS3, PHP, MySQL</p>
+            </div>
+          </div><!-- End Project item-->
+
+          <!-- Auto Facebook post reaction -->
+          <div class="project-item">
+            <h4>Auto Facebook post reaction</h4>
+            <div class="project-languages" style="display:none;">
+              <p>Languages and Technologies: PyAutoGui</p>
+            </div>
+          </div><!-- End Project item-->
+
+          <!-- CoronaVirus affected tracking -->
+          <div class="project-item">
+            <h4>CoronaVirus affected tracking, basic statistical analysis</h4>
+            <div class="project-languages" style="display:none;">
+              <p>Languages and Technologies: Python (List, Matplotlib)</p>
+            </div>
+          </div><!-- End Project item-->
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</section><!-- /Projects Section -->
+
+
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Contact</h2>
+        <p>Ways to reach me out...</p>
+      </div><!-- End Section Title -->
+    
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+    
+        <div class="info-wrap" data-aos="fade-up" data-aos-delay="200">
+          <div class="row gy-5">
+            <div class="col-lg-4">
+              <div class="info-item d-flex align-items-center">
+                <i class="bi bi-geo-alt flex-shrink-0"></i>
+                <div>
+                  <h3>Address</h3>
+                  <p>Mirpur, Dhaka, Bangladesh</p>
+                </div>
+              </div>
+            </div><!-- End Info Item -->
+    
+            <div class="col-lg-4">
+              <div class="info-item d-flex align-items-center">
+                <i class="bi bi-telephone flex-shrink-0"></i>
+                <div>
+                  <h3>Whatsapp</h3>
+                  <p>+8801700677911</p>
+                </div>
+              </div>
+            </div><!-- End Info Item -->
+    
+            <div class="col-lg-4">
+              <div class="info-item d-flex align-items-center">
+                <i class="bi bi-envelope flex-shrink-0"></i>
+                <div>
+                  <h3>Email</h3>
+                  <p>mdfardinrahman@gmail.com</p>
+                </div>
+              </div>
+            </div><!-- End Info Item -->
+            
+            <!-- Social Links -->
+            <div class="col-lg-12">
+              <div class="info-item d-flex justify-content-center">
+                <a href="https://www.facebook.com/mdfardinrahman" target="_blank"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com/iamfardin_rahman/" target="_blank"><i class="bi bi-instagram"></i></a>
+                <a href="https://www.linkedin.com/in/iamfardin" target="_blank"><i class="bi bi-linkedin"></i></a>
+                <a href="https://discord.com/users/743013746330435595" target="_blank"><i class="bi bi-discord"></i></a>
+                <a href="https://github.com/Fardin-Rahman" target="_blank"><i class="bi bi-github"></i></a>
+              </div>
+            </div><!-- End Social Links -->
+          </div>
+        </div>
+    
+        <!-- <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="300">
+          <div class="row gy-4">
+            <div class="col-md-6">
+              <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+            </div>
+            <div class="col-md-6">
+              <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+            </div>
+            <div class="col-md-12">
+              <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+            </div>
+            <div class="col-md-12">
+              <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+            </div>
+            <div class="col-md-12 text-center">
+              <div class="loading">Loading</div>
+              <div class="error-message"></div>
+              <div class="sent-message">Your message has been sent. Thank you!</div>
+              <button type="submit">Send Message</button>
+            </div>
+          </div>
+        </form>End Contact Form -->
+    
+      </div>
+    </section><!-- /Contact Section -->
+    
+  </main>
+
+  <footer id="footer" class="footer">
+
+    <div class="container">
+      <div class="copyright text-center ">
+        <p>© <span>Copyright</span> <strong class="px-1 sitename">Fardin</strong> <span>All Rights Reserved</span></p>
+      </div>
+      <div class="social-links d-flex justify-content-center">
+        <a href="https://www.facebook.com/mdfardinrahman" target="_blank"><i class="bi bi-facebook"></i></a>
+        <a href="https://www.instagram.com/iamfardin_rahman/" target="_blank"><i class="bi bi-instagram"></i></a>
+        <a href="https://www.linkedin.com/in/iamfardin" target="_blank"><i class="bi bi-linkedin"></i></a>
+        <a href="https://discord.com/users/743013746330435595" target="_blank"><i class="bi bi-discord"></i></a>
+        <a href="https://github.com/Fardin-Rahman" target="_blank"><i class="bi bi-github"></i></a>
+    </div>
+    
+    </div>
+    
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you've purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/typed.js/typed.umd.js"></script>
+  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
