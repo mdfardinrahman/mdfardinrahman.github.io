@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MySQL JOINs Visualizer</title>
+
+<style>
+:root{
+  --bg:#0b0f19;
+  --panel:#111827;
+  --text:#f3f4f6;
+  --muted:#9ca3af;
+  --accent:#7c5cff;
+  --accent2:#25d0ab;
+  --border:rgba(255,255,255,.1);
+}
+
+html[data-theme="light"]{
+  --bg:#f5f7ff;
+  --panel:#ffffff;
+  --text:#111827;
+  --muted:#4b5563;
+  --border:rgba(0,0,0,.1);
+}
+
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--text);
+  font-size:17px;
+}
+
+.wrapper{
+  max-width:1200px;
+  margin:auto;
+  padding:30px;
+}
+
+h1{
+  font-size:40px;
+  margin:0;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+
+button{
+  padding:10px 16px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  background:var(--accent);
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.card{
+  background:var(--panel);
+  padding:20px;
+  border-radius:15px;
+  border:1px solid var(--border);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:15px;
+}
+
+th,td{
+  border-bottom:1px solid var(--border);
+  padding:8px;
+  text-align:left;
+}
+
+.highlight{
+  background:rgba(124,92,255,.3);
+}
+
+.themeToggle{
+  position:fixed;
+  top:20px;
+  right:20px;
+  width:80px;
+  height:36px;
+  border-radius:20px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.sql-box{
+  background:#00000033;
+  padding:15px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  overflow:auto;
+  font-size:14px;
+  line-height:1.6;
+  font-family:Consolas,monospace;
+  white-space:pre-wrap;
+}
+
+/* SQL Colors */
+.keyword{ color:#7c5cff; font-weight:bold; }
+.table{ color:#25d0ab; }
+.operator{ color:#ffb020; }
+
+.status{
+  margin-top:10px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="themeToggle" onclick="toggleTheme()">☀ / 🌙</div>
+
+<div class="wrapper">
+
+<h1>MySQL JOINs Visualizer</h1>
+<p class="subtitle">
+Step through how INNER, LEFT, RIGHT and FULL JOIN work.
+Use Next / Prev to see how rows are emitted.
+</p>
+
+<div class="controls">
+<button onclick="setJoin('INNER')">Inner Join</button>
+<button onclick="setJoin('LEFT')">Left Join</button>
+<button onclick="setJoin('RIGHT')">Right Join</button>
+<button onclick="setJoin('FULL')">Full Join</button>
+<button onclick="prevStep()">Prev</button>
+<button onclick="nextStep()">Next</button>
+<button onclick="reset()">Reset</button>
+</div>
+
+<div class="layout">
+
+<div class="card">
+<h3>Students</h3>
+<div id="leftTable"></div>
+
+<h3>Hobbies</h3>
+<div id="rightTable"></div>
+</div>
+
+<div class="card">
+<h3>Simulation</h3>
+<p id="explain"></p>
+
+<h3>SQL Query</h3>
+<div id="sqlBox" class="sql-box"></div>
+
+<h3>Result</h3>
+<div id="resultTable"></div>
+<p class="status" id="status"></p>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const data = {
+left:[
+{id:1,name:"Abrar"},
+{id:2,name:"Bashir"},
+{id:3,name:"Cassie"},
+{id:4,name:"Dylan"},
+{id:5,name:"Erin"},
+{id:6,name:null}
+],
+right:[
+{id:2,hobby:"Fishing"},
+{id:1,hobby:"Singing"},
+{id:3,hobby:"Gardening"},
+{id:1,hobby:"Gaming"},
+{id:5,hobby:"Sleeping"},
+{id:9,hobby:null}
+]
+};
+
+let joinType="INNER";
+let steps=[];
+let stepIndex=0;
+
+function renderTable(container,cols,rows,highlightIndex){
+let html="<table><tr>";
+cols.forEach(c=>html+=`<th>${c}</th>`);
+html+="</tr>";
+
+rows.forEach((row,i)=>{
+html+=`<tr class="${highlightIndex===i?'highlight':''}">`;
+cols.forEach(c=>{
+let val=row[c]??"NULL";
+html+=`<td>${val}</td>`;
+});
+html+="</tr>";
+});
+html+="</table>";
+container.innerHTML=html;
+}
+
+function getSQL(){
+if(joinType==="INNER"){
+return `SELECT s.name, h.hobby
+FROM students s
+INNER JOIN hobbies h
+ON s.id = h.id;`;
+}
+if(joinType==="LEFT"){
+return `SELECT s.name, h.hobby
+FROM students s
+LEFT JOIN hobbies h
+ON s.id = h.id;`;
+}
+if(joinType==="RIGHT"){
+return `SELECT s.name, h.hobby
+FROM students s
+RIGHT JOIN hobbies h
+ON s.id = h.id;`;
+}
+if(joinType==="FULL"){
+return `SELECT s.name, h.hobby
+FROM students s
+LEFT JOIN hobbies h ON s.id = h.id
+UNION
+SELECT s.name, h.hobby
+FROM students s
+RIGHT JOIN hobbies h ON s.id = h.id;`;
+}
+}
+
+/* SAFE TOKENIZER-BASED HIGHLIGHTER */
+function highlightSQL(sql){
+
+const keywords = ["SELECT","FROM","INNER","LEFT","RIGHT","JOIN","UNION","ON"];
+const tables = ["students","hobbies"];
+
+let tokens = sql.split(/(\s+|\b)/);
+
+return tokens.map(token => {
+
+if(keywords.includes(token.toUpperCase())){
+return `<span class="keyword">${token}</span>`;
+}
+
+if(tables.includes(token)){
+return `<span class="table">${token}</span>`;
+}
+
+if(token === "="){
+return `<span class="operator">=</span>`;
+}
+
+return token;
+
+}).join("");
+
+}
+
+function buildSteps(){
+steps=[];
+let result=[];
+let matchedRight=new Array(data.right.length).fill(false);
+
+for(let i=0;i<data.left.length;i++){
+let leftRow=data.left[i];
+let matches=data.right.map((r,j)=>leftRow.id===r.id?j:null).filter(x=>x!==null);
+
+if(joinType==="INNER"||joinType==="LEFT"||joinType==="FULL"){
+if(matches.length>0){
+matches.forEach(j=>{
+matchedRight[j]=true;
+result.push({id:leftRow.id,name:leftRow.name,hobby:data.right[j].hobby});
+steps.push({
+explain:`Match found for id ${leftRow.id}`,
+left:i,right:j,result:[...result]
+});
+});
+}else{
+if(joinType==="LEFT"||joinType==="FULL"){
+result.push({id:leftRow.id,name:leftRow.name,hobby:null});
+steps.push({
+explain:`No match for id ${leftRow.id}`,
+left:i,right:null,result:[...result]
+});
+}
+}
+}
+}
+
+if(joinType==="RIGHT"||joinType==="FULL"){
+for(let j=0;j<data.right.length;j++){
+let rightRow=data.right[j];
+let match=data.left.some(l=>l.id===rightRow.id);
+
+if(joinType==="RIGHT"){
+if(match){
+data.left.forEach((l,i)=>{
+if(l.id===rightRow.id){
+result.push({id:l.id,name:l.name,hobby:rightRow.hobby});
+steps.push({
+explain:`Match found for id ${rightRow.id}`,
+left:i,right:j,result:[...result]
+});
+}
+});
+}else{
+result.push({id:rightRow.id,name:null,hobby:rightRow.hobby});
+steps.push({
+explain:`Right-only id ${rightRow.id}`,
+left:null,right:j,result:[...result]
+});
+}
+}
+
+if(joinType==="FULL"){
+if(!match){
+result.push({id:rightRow.id,name:null,hobby:rightRow.hobby});
+steps.push({
+explain:`Right-only id ${rightRow.id}`,
+left:null,right:j,result:[...result]
+});
+}
+}
+}
+}
+}
+
+function render(){
+if(steps.length===0) buildSteps();
+
+let s=steps[stepIndex];
+
+renderTable(document.getElementById("leftTable"),
+["id","name"],data.left,s?.left);
+
+renderTable(document.getElementById("rightTable"),
+["id","hobby"],data.right,s?.right);
+
+renderTable(document.getElementById("resultTable"),
+["id","name","hobby"],s?.result||[]);
+
+document.getElementById("explain").innerText=s?.explain||"Start simulation";
+document.getElementById("status").innerText=
+`${joinType} • Step ${stepIndex+1} / ${steps.length}`;
+
+document.getElementById("sqlBox").innerHTML =
+highlightSQL(getSQL());
+}
+
+function setJoin(type){
+joinType=type;
+steps=[];
+stepIndex=0;
+buildSteps();
+render();
+}
+
+function nextStep(){
+if(stepIndex<steps.length-1){
+stepIndex++;
+render();
+}
+}
+
+function prevStep(){
+if(stepIndex>0){
+stepIndex--;
+render();
+}
+}
+
+function reset(){
+stepIndex=0;
+render();
+}
+
+function toggleTheme(){
+let html=document.documentElement;
+html.dataset.theme=html.dataset.theme==="light"?"dark":"light";
+}
+
+setJoin("INNER");
+
+</script>
+
+</body>
+</html>
