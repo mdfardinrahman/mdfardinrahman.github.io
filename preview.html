@@ -764,18 +764,49 @@ sheets: {
     }
 
     function computeCategoryScore(dataset, row, categoryKey){
-      // If there is an obvious total column, use it; otherwise sum numerics.
-      const headersLower = dataset.headers.map(h => safeText(h).toLowerCase());
 
-      // special preference columns by category
-      const preferMap = {
-        total: [/^total\b/, /\btotal\b/],
-        quiz:  [/\bquiz\b/],
-        assignment: [/\bassig\b/, /\bassignment\b/],
-        participation: [/\bparticip\b/, /\bclass\b/, /\bcp\b/],
-        mid: [/\bmid\b/, /\bmidterm\b/],
-        final: [/\bfinal\b/, /\bexam\b/],
-      };
+  // For Quiz → use LAST numeric column
+  if (categoryKey === "quiz") {
+
+    for (let i = row.length - 1; i >= 0; i--) {
+      if (i === dataset.idIndex || i === dataset.nameIndex) continue;
+
+      const val = row[i];
+      if (isLikelyNumeric(val)) {
+        return Number(val);
+      }
+    }
+
+    return 0;
+  }
+
+  // For Final → use LAST numeric column
+  if (categoryKey === "final") {
+
+    for (let i = row.length - 1; i >= 0; i--) {
+      if (i === dataset.idIndex || i === dataset.nameIndex) continue;
+
+      const val = row[i];
+      if (isLikelyNumeric(val)) {
+        return Number(val);
+      }
+    }
+
+    return 0;
+  }
+
+  // For others → same logic (last numeric column)
+  for (let i = row.length - 1; i >= 0; i--) {
+    if (i === dataset.idIndex || i === dataset.nameIndex) continue;
+
+    const val = row[i];
+    if (isLikelyNumeric(val)) {
+      return Number(val);
+    }
+  }
+
+  return 0;
+}
 
       const prefers = preferMap[categoryKey] || [];
       if (prefers.length){
