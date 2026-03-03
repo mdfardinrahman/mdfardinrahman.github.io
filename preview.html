@@ -1125,7 +1125,7 @@ sheets: {
       // Build tiles: show the most important-looking columns first
       const tiles = [];
       const importantPatterns = {
-        quiz: [/\btotal\b/i, /\bquiz\b/i],
+        quiz: [/total\s*quiz\s*mark\s*n-?2/i, /\bquiz\s*\d+\b/i, /\bquiz\b/i],
         assignment: [/\btotal\b/i, /\bassig/i, /\bassignment\b/i],
         mid: [/\btotal\b/i, /\bmid/i, /\bmidterm\b/i],
         final: [/\btotal\b/i, /\bfinal\b/i, /\bexam\b/i],
