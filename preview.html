@@ -526,7 +526,7 @@
           <div class="field">
             <div class="label-row">
               <div class="hint">Student ID</div>
-              <div class="hint">Example: 22201416</div>
+              <div class="hint">Example: 20202020</div>
             </div>
 
             <div class="input-wrap">
@@ -768,14 +768,15 @@ sheets: {
       const headersLower = dataset.headers.map(h => safeText(h).toLowerCase());
 
       // special preference columns by category
-      const preferMap = {
-        total: [/^total\b/, /\btotal\b/],
-        quiz:  [/\bquiz\b/],
-        assignment: [/\bassig\b/, /\bassignment\b/],
-        participation: [/\bparticip\b/, /\bclass\b/, /\bcp\b/],
-        mid: [/\bmid\b/, /\bmidterm\b/],
-        final: [/\bfinal\b/, /\bexam\b/],
-      };
+const preferMap = {
+  total: [/^total\b/i],
+  quiz: [/^total\s*quiz\s*mark\s*n-?2\b/i],
+  assignment: [/^final\s*assignment\s*mark\b/i],
+  participation: [/particip/i, /\bcp\b/i, /class/i],
+  mid: [/midterm\s*\(\s*30\s*%\s*\)/i],
+  final: [/^total\+bonus\b/i],
+};
+
 
       const prefers = preferMap[categoryKey] || [];
       if (prefers.length){
