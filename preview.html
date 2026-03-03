@@ -541,9 +541,9 @@
 
             <div class="sep"></div>
 
-            <div class="msg" id="privacyNote">
+            <!-- <div class="msg" id="privacyNote">
               <b>Note:</b> This page reads marks from the Google Sheet link you provided. If the sheet is “viewable by link”, students can check their marks using ID.
-            </div>
+            </div> -->
           </div>
         </div>
       </section>
@@ -1130,6 +1130,7 @@ sheets: {
         mid: [/\btotal\b/i, /\bmid/i, /\bmidterm\b/i],
         final: [/\btotal\b/i, /\bfinal\b/i, /\bexam\b/i],
         participation: [/\bparticip\b/i, /\bcp\b/i, /\bclass\b/i],
+        
       }[categoryKey] || [];
 
       for (let i=0; i<ds.headers.length; i++){
