@@ -763,19 +763,39 @@ sheets: {
       return "";
     }
 
-    function computeCategoryScore(dataset, row, categoryKey){
-      // If there is an obvious total column, use it; otherwise sum numerics.
-      const headersLower = dataset.headers.map(h => safeText(h).toLowerCase());
+function computeCategoryScore(dataset, row, categoryKey){
 
-      // special preference columns by category
-      const preferMap = {
-        total: [/^total\b/, /\btotal\b/],
-        quiz:  [/\bquiz\b/],
-        assignment: [/\bassig\b/, /\bassignment\b/],
-        participation: [/\bparticip\b/, /\bclass\b/, /\bcp\b/],
-        mid: [/\bmid\b/, /\bmidterm\b/],
-        final: [/\bfinal\b/, /\bexam\b/],
-      };
+  const headerMatchers = {
+    // ✅ Quiz → use Total Quiz mark N-2
+    quiz: /total\s*quiz\s*mark\s*n-?2/i,
+
+    // ✅ Final → use Total+Bonus (40%)
+    final: /total\s*\+\s*bonus\s*\(\s*40\s*%?\s*\)/i,
+
+    // Optional: improve others if needed
+    assignment: /total/i,
+    mid: /total/i,
+    participation: /particip/i,
+    total: /^total\b/i
+  };
+
+  const matcher = headerMatchers[categoryKey];
+
+  if (matcher){
+    const idx = dataset.headers.findIndex(h =>
+      matcher.test(String(h || ""))
+    );
+
+    if (idx >= 0){
+      const raw = row[idx];
+      const num = Number(String(raw ?? "").replace(/[^\d.-]/g, ""));
+      return Number.isFinite(num) ? num : 0;
+    }
+  }
+
+  // If specific column not found → return 0
+  return 0;
+}
 
       const prefers = preferMap[categoryKey] || [];
       if (prefers.length){
