@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Joins &amp; Bank DB Visualizer — CSE370 Lab 03</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0e17;--bg2:#111827;--bg3:#1a2235;--bg4:#232d42;
+--accent:#3b82f6;--accent2:#60a5fa;--accent3:#93c5fd;
+--green:#10b981;--green2:#34d399;
+--orange:#f59e0b;--orange2:#fbbf24;
+--red:#ef4444;--red2:#f87171;
+--purple:#8b5cf6;--purple2:#a78bfa;
+--pink:#ec4899;
+--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+--border:#1e293b;--border2:#334155;
+--font-mono:'JetBrains Mono',monospace;
+--font-sans:'IBM Plex Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.6;overflow-x:hidden}
+
+.grain{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:.03;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,14,23,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:60px;gap:1.5rem}
+nav .logo{font-family:var(--font-mono);font-weight:700;font-size:1rem;color:var(--accent2);white-space:nowrap}
+nav .logo span{color:var(--text3)}
+nav .tabs{display:flex;gap:.25rem;margin-left:auto}
+nav .tabs button{background:none;border:none;color:var(--text3);font-family:var(--font-mono);font-size:.78rem;padding:.5rem 1rem;cursor:pointer;border-radius:6px;transition:all .2s}
+nav .tabs button:hover{color:var(--text);background:var(--bg3)}
+nav .tabs button.active{color:var(--accent2);background:rgba(59,130,246,0.1)}
+
+.hero{padding:8rem 2rem 4rem;text-align:center;position:relative}
+.hero::before{content:'';position:absolute;top:60px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-family:var(--font-mono);font-size:2.8rem;font-weight:700;letter-spacing:-1px;margin-bottom:1rem}
+.hero h1 .hl{color:var(--accent2)}
+.hero p{color:var(--text2);font-size:1.1rem;max-width:600px;margin:0 auto}
+
+.container{max-width:1200px;margin:0 auto;padding:0 2rem 4rem}
+
+.section{margin-bottom:4rem;opacity:0;transform:translateY(30px);animation:fadeUp .6s ease forwards}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+.section-header{display:flex;align-items:center;gap:1rem;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.section-header .badge{font-family:var(--font-mono);font-size:.7rem;font-weight:600;padding:.35rem .75rem;border-radius:4px;text-transform:uppercase;letter-spacing:1px}
+.section-header .badge.t1{background:rgba(59,130,246,0.15);color:var(--accent2)}
+.section-header .badge.t2{background:rgba(16,185,129,0.15);color:var(--green2)}
+.section-header .badge.t3{background:rgba(245,158,11,0.15);color:var(--orange2)}
+.section-header .badge.t4{background:rgba(139,92,246,0.15);color:var(--purple2)}
+.section-header h2{font-family:var(--font-mono);font-size:1.4rem;font-weight:600}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
+.card-head{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;background:var(--bg3)}
+.card-head .dot{width:8px;height:8px;border-radius:50%}
+.card-head .dot.r{background:var(--red)}
+.card-head .dot.y{background:var(--orange)}
+.card-head .dot.g{background:var(--green)}
+.card-head .title{font-family:var(--font-mono);font-size:.8rem;color:var(--text2);margin-left:.5rem}
+.card-body{padding:1.5rem}
+
+pre.sql{font-family:var(--font-mono);font-size:.82rem;line-height:1.8;color:var(--text2);overflow-x:auto;white-space:pre-wrap}
+pre.sql .kw{color:var(--accent2);font-weight:600}
+pre.sql .fn{color:var(--orange2)}
+pre.sql .str{color:var(--green2)}
+pre.sql .num{color:var(--purple2)}
+pre.sql .cm{color:var(--text3);font-style:italic}
+
+.schema-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
+.schema-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:transform .2s,border-color .2s}
+.schema-card:hover{transform:translateY(-2px);border-color:var(--border2)}
+.schema-card .sc-head{padding:.75rem 1rem;font-family:var(--font-mono);font-weight:600;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
+.schema-card .sc-head .icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.65rem}
+.schema-card .sc-row{padding:.4rem 1rem;font-family:var(--font-mono);font-size:.75rem;color:var(--text2);display:flex;justify-content:space-between;border-bottom:1px solid rgba(30,41,59,0.5)}
+.schema-card .sc-row:last-child{border:none}
+.schema-card .sc-row .pk{color:var(--orange2);font-weight:600}
+.schema-card .sc-row .fk{color:var(--purple2)}
+.schema-card .sc-row .type{color:var(--text3);font-size:.7rem}
+
+.data-table-wrap{overflow-x:auto;margin:1rem 0}
+table.dt{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.78rem}
+table.dt th{background:var(--bg4);color:var(--accent3);font-weight:600;padding:.6rem .8rem;text-align:left;border-bottom:2px solid var(--accent);white-space:nowrap;position:sticky;top:0}
+table.dt td{padding:.5rem .8rem;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap}
+table.dt tr:hover td{background:rgba(59,130,246,0.05)}
+table.dt tr.hl-row td{background:rgba(16,185,129,0.08)}
+table.dt td.null-val{color:var(--text3);font-style:italic}
+
+.join-viz{position:relative}
+.join-controls{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.join-controls button{font-family:var(--font-mono);font-size:.78rem;padding:.55rem 1.2rem;border:1px solid var(--border);background:var(--bg3);color:var(--text2);border-radius:6px;cursor:pointer;transition:all .2s}
+.join-controls button:hover{border-color:var(--accent);color:var(--text)}
+.join-controls button.active{background:rgba(59,130,246,0.15);border-color:var(--accent);color:var(--accent2)}
+
+.step-nav{display:flex;align-items:center;gap:1rem;margin:1.5rem 0}
+.step-nav button{font-family:var(--font-mono);font-size:.8rem;padding:.5rem 1.2rem;border:1px solid var(--border);background:var(--bg3);color:var(--text2);border-radius:6px;cursor:pointer;transition:all .2s}
+.step-nav button:hover:not(:disabled){border-color:var(--accent);color:var(--text)}
+.step-nav button:disabled{opacity:.3;cursor:not-allowed}
+.step-nav .step-info{font-family:var(--font-mono);font-size:.8rem;color:var(--text3)}
+
+.step-explain{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1.25rem 1.5rem;margin:1rem 0;font-size:.9rem;line-height:1.7}
+.step-explain .step-title{font-family:var(--font-mono);font-weight:600;color:var(--accent2);margin-bottom:.5rem;font-size:.85rem}
+.step-explain p{color:var(--text2)}
+
+.venn-container{display:flex;justify-content:center;align-items:center;padding:2rem;gap:2rem;flex-wrap:wrap}
+.venn-svg{max-width:320px}
+
+.join-result-area{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1rem 0}
+@media(max-width:768px){.join-result-area{grid-template-columns:1fr}}
+.join-result-area .source-tables{display:flex;flex-direction:column;gap:1rem}
+.join-result-area .result-table{min-width:0}
+
+.tbl-label{font-family:var(--font-mono);font-size:.75rem;color:var(--text3);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.tbl-label .dot-sm{width:6px;height:6px;border-radius:50%}
+
+.highlight-blue{background:rgba(59,130,246,0.12) !important}
+.highlight-green{background:rgba(16,185,129,0.12) !important}
+.highlight-orange{background:rgba(245,158,11,0.12) !important}
+.highlight-purple{background:rgba(139,92,246,0.12) !important}
+.highlight-red{background:rgba(239,68,68,0.1) !important}
+
+.match-line{position:absolute;pointer-events:none}
+
+.legend{display:flex;gap:1.5rem;margin:1rem 0;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:.4rem;font-family:var(--font-mono);font-size:.72rem;color:var(--text3)}
+.legend-item .swatch{width:12px;height:12px;border-radius:3px}
+
+.task4-breakdown{margin:1.5rem 0}
+.t4-step{background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;overflow:hidden;transition:all .3s}
+.t4-step.active{border-color:var(--purple)}
+.t4-step-head{padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:1rem;transition:background .2s}
+.t4-step-head:hover{background:var(--bg4)}
+.t4-step-num{width:32px;height:32px;border-radius:50%;background:var(--bg4);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;font-size:.8rem;color:var(--text3);flex-shrink:0;transition:all .3s}
+.t4-step.active .t4-step-num{border-color:var(--purple);color:var(--purple2);background:rgba(139,92,246,0.1)}
+.t4-step-title{font-family:var(--font-mono);font-size:.85rem;font-weight:500}
+.t4-step-body{padding:0 1.25rem 1.25rem;display:none}
+.t4-step.active .t4-step-body{display:block}
+.t4-arrow{margin-left:auto;color:var(--text3);transition:transform .3s;font-size:.8rem}
+.t4-step.active .t4-arrow{transform:rotate(180deg)}
+
+.flow-diagram{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1rem 0;padding:1rem;background:var(--bg2);border-radius:8px;border:1px solid var(--border)}
+.flow-box{padding:.5rem .8rem;border-radius:6px;font-family:var(--font-mono);font-size:.75rem;font-weight:600;border:1px solid}
+.flow-arrow{color:var(--text3);font-size:1rem}
+
+.info-box{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:1rem 1.25rem;margin:1rem 0;font-size:.85rem;color:var(--accent3)}
+.info-box.warn{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.2);color:var(--orange2)}
+.info-box.success{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.2);color:var(--green2)}
+
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.scroll-top{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:1.2rem;display:none;align-items:center;justify-content:center;z-index:50;box-shadow:0 4px 20px rgba(59,130,246,0.3);transition:transform .2s}
+.scroll-top:hover{transform:scale(1.1)}
+.scroll-top.show{display:flex}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1rem 0}
+@media(max-width:768px){.compare-grid{grid-template-columns:1fr}}
+
+td.matched{position:relative}
+td.matched::after{content:'✓';position:absolute;right:4px;top:50%;transform:translateY(-50%);color:var(--green);font-size:.65rem}
+
+.anim-row{animation:rowSlide .3s ease}
+@keyframes rowSlide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+
+footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);color:var(--text3);font-size:.8rem;font-family:var(--font-mono)}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav>
+  <div class="logo">Bank<span>DB</span>::Visualizer</div>
+  <div class="tabs">
+    <button class="active" onclick="switchTab('task1')">Task 1</button>
+    <button onclick="switchTab('task2')">Task 2</button>
+    <button onclick="switchTab('task3')">Task 3</button>
+    <button onclick="switchTab('task4')">Task 4</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>SQL <span class="hl">Joins</span> &amp; Bank DB</h1>
+  <p>Interactive visualization of database creation, data insertion, and JOIN operations — CSE370 Lab 03</p>
+</div>
+
+<div class="container">
+
+<!-- ========== TASK 1 ========== -->
+<div id="task1" class="tab-content active">
+<div class="section" style="animation-delay:.1s">
+  <div class="section-header">
+    <span class="badge t1">Task 1</span>
+    <h2>Create the Bank Database &amp; Tables</h2>
+  </div>
+
+  <div class="info-box">This task creates the <strong>Bank</strong> database with 6 tables: <strong>customer</strong>, <strong>branch</strong>, <strong>account</strong>, <strong>loan</strong>, <strong>depositor</strong>, and <strong>borrower</strong>. Each table has primary keys, and some have foreign keys and CHECK constraints.</div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="title">SQL — Create Database &amp; Tables</span>
+    </div>
+    <div class="card-body">
+      <pre class="sql" id="task1-sql"></pre>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--font-mono);font-size:1rem;margin:2rem 0 1rem;color:var(--accent3)">Schema Overview</h3>
+  <div class="schema-grid" id="schema-grid"></div>
+
+  <div class="info-box success" style="margin-top:1.5rem">
+    <strong>Relationships:</strong> <code>depositor</code> links customers to accounts (FK → customer, FK → account). <code>borrower</code> links customers to loans (FK → customer, FK → loan). CHECK constraints ensure <code>assets ≥ 0</code> and <code>balance ≥ 0</code>.
+  </div>
+</div>
+</div>
+
+<!-- ========== TASK 2 ========== -->
+<div id="task2" class="tab-content">
+<div class="section" style="animation-delay:.1s">
+  <div class="section-header">
+    <span class="badge t2">Task 2</span>
+    <h2>Insert Data into Tables</h2>
+  </div>
+
+  <div class="info-box">After creating the schema, we populate all 6 tables with sample data. Click each table tab to see its data.</div>
+
+  <div class="join-controls" id="data-tabs"></div>
+  <div id="data-table-container"></div>
+</div>
+</div>
+
+<!-- ========== TASK 3 ========== -->
+<div id="task3" class="tab-content">
+<div class="section" style="animation-delay:.1s">
+  <div class="section-header">
+    <span class="badge t3">Task 3</span>
+    <h2>SQL Join Operations</h2>
+  </div>
+
+  <div class="info-box">We join <strong>customer</strong> and <strong>depositor</strong> tables to retrieve customer id, name, city, and account number using different JOIN types. Use the buttons below to switch between join types and step through the simulation.</div>
+
+  <div class="join-controls" id="join-type-btns"></div>
+
+  <div id="join-venn-area" class="venn-container"></div>
+
+  <div id="join-explain" class="step-explain"></div>
+
+  <div class="step-nav">
+    <button id="join-prev" onclick="joinStepPrev()">← Prev</button>
+    <span class="step-info" id="join-step-info"></span>
+    <button id="join-next" onclick="joinStepNext()">Next →</button>
+    <button id="join-all" onclick="joinShowAll()" style="margin-left:auto">Show All Rows</button>
+  </div>
+
+  <div id="join-tables-area"></div>
+
+  <div class="compare-grid" style="margin-top:2rem">
+    <div class="card">
+      <div class="card-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">SQL Query</span></div>
+      <div class="card-body"><pre class="sql" id="join-sql-display"></pre></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">Key Differences</span></div>
+      <div class="card-body"><div id="join-diff-display" style="font-size:.85rem;color:var(--text2);line-height:1.8"></div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ========== TASK 4 ========== -->
+<div id="task4" class="tab-content">
+<div class="section" style="animation-delay:.1s">
+  <div class="section-header">
+    <span class="badge t4">Task 4</span>
+    <h2>Multi-Table Join — Detailed Breakdown</h2>
+  </div>
+
+  <div class="info-box">Retrieve <strong>Customer name, city, account number, balance, and branch name</strong> by joining 3 tables. This requires chaining joins across <strong>customer → depositor → account</strong>.</div>
+
+  <div class="card" style="margin-bottom:2rem">
+    <div class="card-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">Full SQL Query</span></div>
+    <div class="card-body"><pre class="sql" id="task4-full-sql"></pre></div>
+  </div>
+
+  <h3 style="font-family:var(--font-mono);font-size:1rem;margin:0 0 1.5rem;color:var(--purple2)">Step-by-Step Query Breakdown</h3>
+
+  <div class="task4-breakdown" id="task4-steps"></div>
+
+  <div class="step-nav">
+    <button id="t4-prev" onclick="t4StepPrev()">← Prev Step</button>
+    <span class="step-info" id="t4-step-info"></span>
+    <button id="t4-next" onclick="t4StepNext()">Next Step →</button>
+  </div>
+
+  <div id="t4-result-area" style="margin-top:1.5rem"></div>
+
+  <div class="card" style="margin-top:2rem">
+    <div class="card-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">Alternative — Without JOIN Keyword (Task 5 Style)</span></div>
+    <div class="card-body"><pre class="sql" id="task4-alt-sql"></pre></div>
+  </div>
+  <div class="info-box success">Both queries produce the <strong>exact same result</strong>. The JOIN keyword version is more readable and explicit about the join conditions, while the WHERE clause version is the older SQL-89 style.</div>
+</div>
+</div>
+
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo(0,0)">↑</button>
+<footer>CSE370 — Database Systems — Spring 2026 — Lab 03 Visualizer</footer>
+
+<script>
+const DB = {
+  customer: {
+    cols: ['customer_id','customer_name','customer_street','customer_city'],
+    pk: ['customer_id'],
+    rows: [
+      ['C-101','Jones','Main','Harrison'],
+      ['C-201','Smith','North','Rye'],
+      ['C-211','Hayes','Main','Harrison'],
+      ['C-212','Curry','North','Rye'],
+      ['C-215','Lindsay','Park','Pittsfield'],
+      ['C-220','Turner','Putnam','Stamford'],
+      ['C-222','Williams','Nassau','Princeton'],
+      ['C-225','Adams','Spring','Pittsfield'],
+      ['C-226','Johnson','Alma','Palo Alto'],
+      ['C-233','Glenn','Sand Hill','Woodside'],
+      ['C-234','Brooks','Senator','Brooklyn'],
+      ['C-255','Green','Walnut','Stamford']
+    ]
+  },
+  branch: {
+    cols: ['branch_name','branch_city','assets'],
+    pk: ['branch_name'],
+    rows: [
+      ['Downtown','Brooklyn',9000000],
+      ['Redwood','Palo Alto',2100000],
+      ['Perryridge','Horseneck',1700000],
+      ['Mianus','Horseneck',400000],
+      ['Round Hill','Horseneck',8000000],
+      ['Pownal','Bennington',300000],
+      ['North Town','Rye',3700000],
+      ['Brighton','Brooklyn',7100000]
+    ]
+  },
+  account: {
+    cols: ['branch_name','account_number','balance'],
+    pk: ['account_number'],
+    rows: [
+      ['Downtown','A-101',500],
+      ['Mianus','A-215',700],
+      ['Perryridge','A-102',400],
+      ['Round Hill','A-305',350],
+      ['Brighton','A-201',900],
+      ['Redwood','A-222',700],
+      ['Brighton','A-217',750]
+    ]
+  },
+  loan: {
+    cols: ['loan_number','branch_name','amount'],
+    pk: ['loan_number'],
+    rows: [
+      ['L-17','Downtown',1000],
+      ['L-23','Redwood',2000],
+      ['L-15','Perryridge',1500],
+      ['L-14','Downtown',1500],
+      ['L-93','Mianus',500],
+      ['L-11','Round Hill',900],
+      ['L-16','Perryridge',1300]
+    ]
+  },
+  depositor: {
+    cols: ['customer_id','account_number'],
+    pk: ['customer_id','account_number'],
+    fk: ['customer_id → customer','account_number → account'],
+    rows: [
+      ['C-226','A-101'],
+      ['C-201','A-215'],
+      ['C-211','A-102'],
+      ['C-220','A-305'],
+      ['C-226','A-201'],
+      ['C-101','A-217'],
+      ['C-215','A-222']
+    ]
+  },
+  borrower: {
+    cols: ['customer_id','loan_number'],
+    pk: ['customer_id','loan_number'],
+    fk: ['customer_id → customer','loan_number → loan'],
+    rows: [
+      ['C-101','L-17'],
+      ['C-201','L-23'],
+      ['C-211','L-15'],
+      ['C-226','L-14'],
+      ['C-212','L-93'],
+      ['C-201','L-11'],
+      ['C-222','L-17'],
+      ['C-225','L-16']
+    ]
+  }
+};
+
+const schemaColors = {
+  customer: {bg:'rgba(59,130,246,0.15)',border:'var(--accent)',color:'var(--accent2)'},
+  branch: {bg:'rgba(16,185,129,0.15)',border:'var(--green)',color:'var(--green2)'},
+  account: {bg:'rgba(245,158,11,0.15)',border:'var(--orange)',color:'var(--orange2)'},
+  loan: {bg:'rgba(239,68,68,0.15)',border:'var(--red)',color:'var(--red2)'},
+  depositor: {bg:'rgba(139,92,246,0.15)',border:'var(--purple)',color:'var(--purple2)'},
+  borrower: {bg:'rgba(236,72,153,0.15)',border:'var(--pink)',color:'var(--pink)'}
+};
+
+const typeMap = {
+  customer_id:'varchar(10) NOT NULL', customer_name:'varchar(20) NOT NULL', customer_street:'varchar(30)', customer_city:'varchar(30)',
+  branch_name:'varchar(15)', branch_city:'varchar(30)', assets:'int', account_number:'varchar(10) NOT NULL', balance:'int',
+  loan_number:'varchar(10) NOT NULL', amount:'int'
+};
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav .tabs button').forEach((b,i) => {
+    b.classList.toggle('active', b.textContent.toLowerCase().replace(' ','') === id);
+  });
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('nav .tabs button').forEach(b => {
+  b.addEventListener('click', () => switchTab(b.textContent.toLowerCase().replace(' ','')));
+});
+
+function hl(sql) {
+  return sql
+    .replace(/\b(CREATE DATABASE|USE|CREATE TABLE|INSERT INTO|VALUES|PRIMARY KEY|FOREIGN KEY|REFERENCES|CHECK|NOT NULL|SELECT|FROM|INNER JOIN|LEFT JOIN|RIGHT JOIN|FULL JOIN|FULL OUTER JOIN|ON|WHERE|AND|OR|AS|ORDER BY|GROUP BY|HAVING|BETWEEN|LIKE|IN|LIMIT|DESC|ASC|AVG|COUNT|DISTINCT|JOIN|INT|VARCHAR)\b/gi, '<span class="kw">$1</span>')
+    .replace(/'([^']*)'/g, '<span class="str">\'$1\'</span>')
+    .replace(/\b(\d+)\b/g, '<span class="num">$1</span>')
+    .replace(/(--.*)/g, '<span class="cm">$1</span>');
+}
+
+function renderTable(cols, rows, options = {}) {
+  let {highlights, showNull, maxRows, label, labelColor} = Object.assign({highlights:{},showNull:true,maxRows:999,label:'',labelColor:'var(--text3)'}, options);
+  let html = '';
+  if (label) html += `<div class="tbl-label"><span class="dot-sm" style="background:${labelColor}"></span>${label}</div>`;
+  html += '<div class="data-table-wrap"><table class="dt"><thead><tr>';
+  cols.forEach(c => html += `<th>${c}</th>`);
+  html += '</tr></thead><tbody>';
+  rows.slice(0, maxRows).forEach((r, ri) => {
+    let cls = highlights[ri] || '';
+    html += `<tr class="${cls}">`;
+    r.forEach(v => {
+      if (v === null && showNull) html += '<td class="null-val">NULL</td>';
+      else html += `<td>${v === null ? '' : v}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+// ===== TASK 1 =====
+function initTask1() {
+  const sql = `CREATE DATABASE Bank;
+USE Bank;
+
+CREATE TABLE customer (
+  customer_id    varchar(10) NOT NULL,
+  customer_name  varchar(20) NOT NULL,
+  customer_street varchar(30),
+  customer_city  varchar(30),
+  PRIMARY KEY (customer_id)
+);
+
+CREATE TABLE branch (
+  branch_name varchar(15),
+  branch_city varchar(30),
+  assets      int,
+  PRIMARY KEY (branch_name),
+  CHECK (assets >= 0)
+);
+
+CREATE TABLE account (
+  branch_name    varchar(15),
+  account_number varchar(10) NOT NULL,
+  balance        int,
+  PRIMARY KEY (account_number),
+  CHECK (balance >= 0)
+);
+
+CREATE TABLE loan (
+  loan_number varchar(10) NOT NULL,
+  branch_name varchar(15),
+  amount      int,
+  PRIMARY KEY (loan_number)
+);
+
+CREATE TABLE depositor (
+  customer_id    varchar(10) NOT NULL,
+  account_number varchar(10) NOT NULL,
+  PRIMARY KEY (customer_id, account_number),
+  FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+  FOREIGN KEY (account_number) REFERENCES account(account_number)
+);
+
+CREATE TABLE borrower (
+  customer_id varchar(10) NOT NULL,
+  loan_number varchar(10) NOT NULL,
+  PRIMARY KEY (customer_id, loan_number),
+  FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+  FOREIGN KEY (loan_number) REFERENCES loan(loan_number)
+);`;
+  document.getElementById('task1-sql').innerHTML = hl(sql);
+
+  let grid = '';
+  for (let tbl in DB) {
+    let sc = schemaColors[tbl];
+    let t = DB[tbl];
+    grid += `<div class="schema-card" style="border-top:3px solid ${sc.border}">`;
+    grid += `<div class="sc-head"><div class="icon" style="background:${sc.bg};color:${sc.color}">⊞</div><span style="color:${sc.color}">${tbl}</span></div>`;
+    t.cols.forEach(c => {
+      let isPk = t.pk.includes(c);
+      let isFk = t.fk && t.fk.some(f => f.startsWith(c));
+      let badge = isPk ? '<span class="pk">PK</span>' : isFk ? '<span class="fk">FK</span>' : '';
+      grid += `<div class="sc-row"><span>${badge} ${c}</span><span class="type">${typeMap[c]||'varchar'}</span></div>`;
+    });
+    grid += '</div>';
+  }
+  document.getElementById('schema-grid').innerHTML = grid;
+}
+
+// ===== TASK 2 =====
+let currentDataTab = 'customer';
+function initTask2() {
+  let tabs = '';
+  for (let tbl in DB) {
+    tabs += `<button class="${tbl===currentDataTab?'active':''}" onclick="showDataTab('${tbl}')">${tbl}</button>`;
+  }
+  document.getElementById('data-tabs').innerHTML = tabs;
+  showDataTab(currentDataTab);
+}
+
+function showDataTab(tbl) {
+  currentDataTab = tbl;
+  document.querySelectorAll('#data-tabs button').forEach(b => b.classList.toggle('active', b.textContent === tbl));
+  let t = DB[tbl];
+  let sc = schemaColors[tbl];
+  let html = `<div class="card fade-in"><div class="card-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">${tbl} — ${t.rows.length} rows</span></div><div class="card-body">`;
+  html += renderTable(t.cols, t.rows, {label: tbl, labelColor: sc.border});
+  html += `<div style="margin-top:1rem"><pre class="sql" style="font-size:.75rem">`;
+  html += hl(`INSERT INTO ${tbl} VALUES\n` + t.rows.map(r => `  (${r.map(v => typeof v === 'number' ? v : `'${v}'`).join(', ')})`).join(',\n') + ';');
+  html += `</pre></div></div></div>`;
+  document.getElementById('data-table-container').innerHTML = html;
+}
+
+// ===== TASK 3 =====
+const joinTypes = ['INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL JOIN'];
+let currentJoin = 0;
+let joinStep = 0;
+
+function computeJoin(type) {
+  let cust = DB.customer.rows;
+  let dep = DB.depositor.rows;
+  let result = [];
+  let custMatched = new Set();
+  let depMatched = new Set();
+
+  for (let ci = 0; ci < cust.length; ci++) {
+    let matched = false;
+    for (let di = 0; di < dep.length; di++) {
+      if (cust[ci][0] === dep[di][0]) {
+        result.push({
+          row: [cust[ci][0], cust[ci][1], cust[ci][3], dep[di][1]],
+          ci, di, type: 'match'
+        });
+        custMatched.add(ci);
+        depMatched.add(di);
+        matched = true;
+      }
+    }
+    if (!matched && (type === 'LEFT JOIN' || type === 'FULL JOIN')) {
+      result.push({
+        row: [cust[ci][0], cust[ci][1], cust[ci][3], null],
+        ci, di: -1, type: 'left-only'
+      });
+      custMatched.add(ci);
+    }
+  }
+  if (type === 'RIGHT JOIN' || type === 'FULL JOIN') {
+    for (let di = 0; di < dep.length; di++) {
+      if (!depMatched.has(di)) {
+        result.push({
+          row: [null, null, null, dep[di][1]],
+          ci: -1, di, type: 'right-only'
+        });
+      }
+    }
+  }
+  return result;
+}
+
+const joinDescriptions = {
+  'INNER JOIN': {
+    title: 'INNER JOIN',
+    desc: 'Returns only the rows where there is a match in BOTH tables. Customers without accounts and depositor entries without matching customers are excluded.',
+    color: 'var(--green2)',
+    vennFill: 'intersection'
+  },
+  'LEFT JOIN': {
+    title: 'LEFT JOIN',
+    desc: 'Returns ALL rows from the LEFT table (customer), plus matched rows from the RIGHT table (depositor). If a customer has no account, their account_number will be NULL.',
+    color: 'var(--accent2)',
+    vennFill: 'left'
+  },
+  'RIGHT JOIN': {
+    title: 'RIGHT JOIN',
+    desc: 'Returns ALL rows from the RIGHT table (depositor), plus matched rows from the LEFT table (customer). If a depositor entry has no matching customer, the customer fields will be NULL.',
+    color: 'var(--orange2)',
+    vennFill: 'right'
+  },
+  'FULL JOIN': {
+    title: 'FULL JOIN (FULL OUTER JOIN)',
+    desc: 'Returns ALL rows from BOTH tables. Unmatched rows from either side will have NULL for the missing columns. Note: MySQL does not support FULL JOIN directly — use UNION of LEFT and RIGHT JOIN.',
+    color: 'var(--purple2)',
+    vennFill: 'full'
+  }
+};
+
+function makeVenn(type) {
+  let fill = joinDescriptions[type].vennFill;
+  let leftFill = (fill === 'left' || fill === 'full') ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.08)';
+  let rightFill = (fill === 'right' || fill === 'full') ? 'rgba(245,158,11,0.25)' : 'rgba(245,158,11,0.08)';
+  let interFill = 'rgba(16,185,129,0.35)';
+  let leftStroke = (fill === 'left' || fill === 'full' || fill === 'intersection') ? 'var(--accent)' : 'var(--border2)';
+  let rightStroke = (fill === 'right' || fill === 'full' || fill === 'intersection') ? 'var(--orange)' : 'var(--border2)';
+
+  return `<svg class="venn-svg" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <clipPath id="clipLeft"><circle cx="120" cy="100" r="80"/></clipPath>
+      <clipPath id="clipRight"><circle cx="200" cy="100" r="80"/></clipPath>
+    </defs>
+    <circle cx="120" cy="100" r="80" fill="${leftFill}" stroke="${leftStroke}" stroke-width="2"/>
+    <circle cx="200" cy="100" r="80" fill="${rightFill}" stroke="${rightStroke}" stroke-width="2"/>
+    <g clip-path="url(#clipLeft)"><circle cx="200" cy="100" r="80" fill="${interFill}"/></g>
+    <text x="85" y="95" font-family="var(--font-mono)" font-size="11" fill="var(--accent3)" text-anchor="middle">customer</text>
+    <text x="85" y="112" font-family="var(--font-mono)" font-size="9" fill="var(--text3)" text-anchor="middle">(12 rows)</text>
+    <text x="235" y="95" font-family="var(--font-mono)" font-size="11" fill="var(--orange2)" text-anchor="middle">depositor</text>
+    <text x="235" y="112" font-family="var(--font-mono)" font-size="9" fill="var(--text3)" text-anchor="middle">(7 rows)</text>
+    <text x="160" y="100" font-family="var(--font-mono)" font-size="9" fill="var(--green2)" text-anchor="middle">matched</text>
+    <text x="160" y="85" font-family="var(--font-mono)" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">${type}</text>
+    ${fill === 'intersection' ? '<rect x="110" y="25" width="100" height="25" rx="4" fill="rgba(16,185,129,0.2)" stroke="var(--green)" stroke-width="1"/><text x="160" y="42" font-family="var(--font-mono)" font-size="9" fill="var(--green2)" text-anchor="middle">only overlap</text>' : ''}
+  </svg>`;
+}
+
+function initTask3() {
+  let btns = '';
+  joinTypes.forEach((jt, i) => {
+    btns += `<button class="${i===currentJoin?'active':''}" onclick="setJoinType(${i})">${jt}</button>`;
+  });
+  document.getElementById('join-type-btns').innerHTML = btns;
+  renderJoin();
+}
+
+function setJoinType(i) {
+  currentJoin = i;
+  joinStep = 0;
+  document.querySelectorAll('#join-type-btns button').forEach((b,bi) => b.classList.toggle('active', bi === i));
+  renderJoin();
+}
+
+function renderJoin() {
+  let type = joinTypes[currentJoin];
+  let info = joinDescriptions[type];
+  let result = computeJoin(type);
+  let totalSteps = result.length;
+
+  document.getElementById('join-venn-area').innerHTML = makeVenn(type);
+
+  document.getElementById('join-explain').innerHTML = `<div class="step-title">${info.title}</div><p>${info.desc}</p>`;
+
+  let sqlMap = {
+    'INNER JOIN': `SELECT c.customer_id, c.customer_name,\n       c.customer_city, d.account_number\nFROM customer c\nINNER JOIN depositor d\n  ON c.customer_id = d.customer_id;`,
+    'LEFT JOIN': `SELECT c.customer_id, c.customer_name,\n       c.customer_city, d.account_number\nFROM customer c\nLEFT JOIN depositor d\n  ON c.customer_id = d.customer_id;`,
+    'RIGHT JOIN': `SELECT c.customer_id, c.customer_name,\n       c.customer_city, d.account_number\nFROM customer c\nRIGHT JOIN depositor d\n  ON c.customer_id = d.customer_id;`,
+    'FULL JOIN': `-- MySQL does not support FULL JOIN directly.\n-- Use UNION of LEFT and RIGHT JOIN:\nSELECT c.customer_id, c.customer_name,\n       c.customer_city, d.account_number\nFROM customer c\nLEFT JOIN depositor d\n  ON c.customer_id = d.customer_id\nUNION\nSELECT c.customer_id, c.customer_name,\n       c.customer_city, d.account_number\nFROM customer c\nRIGHT JOIN depositor d\n  ON c.customer_id = d.customer_id;`
+  };
+  document.getElementById('join-sql-display').innerHTML = hl(sqlMap[type]);
+
+  let diffMap = {
+    'INNER JOIN': `<strong style="color:var(--green2)">Result: ${result.length} rows</strong><br>Only customers who appear in the depositor table are shown. Customers like Curry, Turner, Williams, Adams, Glenn, Brooks, Green have no accounts and are excluded.`,
+    'LEFT JOIN': `<strong style="color:var(--accent2)">Result: ${result.length} rows</strong><br>All 12 customers appear. Those without accounts (5 customers) have NULL for account_number. Compared to INNER JOIN, we get ${result.length - computeJoin('INNER JOIN').length} extra rows (unmatched customers).`,
+    'RIGHT JOIN': `<strong style="color:var(--orange2)">Result: ${result.length} rows</strong><br>All depositor entries are shown. Since every depositor references a valid customer, the result is the same as INNER JOIN (${result.length} rows). There are no "orphan" depositor rows.`,
+    'FULL JOIN': `<strong style="color:var(--purple2)">Result: ${result.length} rows</strong><br>All customers AND all depositors appear. Unmatched customers show NULL account_number. Since all depositors have valid customers, no right-only NULLs appear. Combines LEFT + RIGHT results.`
+  };
+  document.getElementById('join-diff-display').innerHTML = diffMap[type];
+
+  renderJoinStep(result, totalSteps);
+}
+
+function renderJoinStep(result, totalSteps) {
+  if (!result) result = computeJoin(joinTypes[currentJoin]);
+  if (!totalSteps) totalSteps = result.length;
+
+  let showCount = Math.min(joinStep + 1, totalSteps);
+  document.getElementById('join-step-info').textContent = `Row ${showCount} of ${totalSteps}`;
+  document.getElementById('join-prev').disabled = joinStep <= 0;
+  document.getElementById('join-next').disabled = joinStep >= totalSteps - 1;
+
+  let visibleRows = result.slice(0, showCount);
+  let custHighlights = {};
+  let depHighlights = {};
+  visibleRows.forEach(r => {
+    if (r.ci >= 0) custHighlights[r.ci] = r.type === 'match' ? 'highlight-green' : 'highlight-blue';
+    if (r.di >= 0) depHighlights[r.di] = r.type === 'match' ? 'highlight-green' : 'highlight-orange';
+  });
+
+  let currentEntry = visibleRows[visibleRows.length - 1];
+  if (currentEntry && currentEntry.ci >= 0) custHighlights[currentEntry.ci] = 'highlight-purple';
+  if (currentEntry && currentEntry.di >= 0) depHighlights[currentEntry.di] = 'highlight-purple';
+
+  let resultHighlights = {};
+  resultHighlights[visibleRows.length - 1] = 'highlight-purple';
+
+  let html = '<div class="join-result-area"><div class="source-tables">';
+  html += renderTable(['customer_id','customer_name','customer_street','customer_city'], DB.customer.rows, {highlights: custHighlights, label:'customer (LEFT table)', labelColor:'var(--accent)'});
+  html += renderTable(['customer_id','account_number'], DB.depositor.rows, {highlights: depHighlights, label:'depositor (RIGHT table)', labelColor:'var(--orange)'});
+  html += '</div><div class="result-table">';
+  html += `<div class="tbl-label"><span class="dot-sm" style="background:var(--green)"></span>Result (${visibleRows.length} row${visibleRows.length!==1?'s':''})</div>`;
+  html += '<div class="data-table-wrap"><table class="dt"><thead><tr><th>customer_id</th><th>customer_name</th><th>customer_city</th><th>account_number</th></tr></thead><tbody>';
+  visibleRows.forEach((r, i) => {
+    let cls = i === visibleRows.length - 1 ? 'highlight-purple anim-row' : (r.type === 'match' ? 'highlight-green' : r.type === 'left-only' ? 'highlight-blue' : 'highlight-orange');
+    html += `<tr class="${cls}">`;
+    r.row.forEach(v => {
+      if (v === null) html += '<td class="null-val">NULL</td>';
+      else html += `<td>${v}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+
+  html += '<div class="legend" style="margin-top:.75rem">';
+  html += '<div class="legend-item"><div class="swatch" style="background:rgba(139,92,246,0.3)"></div>Current row</div>';
+  html += '<div class="legend-item"><div class="swatch" style="background:rgba(16,185,129,0.2)"></div>Matched</div>';
+  html += '<div class="legend-item"><div class="swatch" style="background:rgba(59,130,246,0.2)"></div>Left only (NULL)</div>';
+  html += '<div class="legend-item"><div class="swatch" style="background:rgba(245,158,11,0.2)"></div>Right only (NULL)</div>';
+  html += '</div>';
+
+  if (currentEntry) {
+    let stepText = '';
+    if (currentEntry.type === 'match') {
+      stepText = `<strong style="color:var(--green2)">Match found!</strong> customer.<code>${DB.customer.rows[currentEntry.ci][0]}</code> = depositor.<code>${DB.depositor.rows[currentEntry.di][0]}</code> → Row added with account <code>${DB.depositor.rows[currentEntry.di][1]}</code>`;
+    } else if (currentEntry.type === 'left-only') {
+      stepText = `<strong style="color:var(--accent2)">No match.</strong> Customer <code>${DB.customer.rows[currentEntry.ci][1]}</code> (<code>${DB.customer.rows[currentEntry.ci][0]}</code>) has no depositor entry → account_number = <code>NULL</code>`;
+    } else {
+      stepText = `<strong style="color:var(--orange2)">Right-only.</strong> Depositor entry with no matching customer → customer fields = <code>NULL</code>`;
+    }
+    html += `<div class="info-box" style="margin-top:.75rem;font-size:.82rem">${stepText}</div>`;
+  }
+
+  html += '</div></div>';
+  document.getElementById('join-tables-area').innerHTML = html;
+}
+
+function joinStepPrev() {
+  if (joinStep > 0) { joinStep--; renderJoinStep(computeJoin(joinTypes[currentJoin])); }
+}
+function joinStepNext() {
+  let result = computeJoin(joinTypes[currentJoin]);
+  if (joinStep < result.length - 1) { joinStep++; renderJoinStep(result); }
+}
+function joinShowAll() {
+  let result = computeJoin(joinTypes[currentJoin]);
+  joinStep = result.length - 1;
+  renderJoinStep(result);
+}
+
+// ===== TASK 4 =====
+let t4Step = 0;
+const t4Steps = [
+  {
+    title: 'Step 1: Identify the tables we need',
+    content: `<p>We need: <strong>customer_name</strong>, <strong>customer_city</strong> (from <code>customer</code>), <strong>account_number</strong>, <strong>balance</strong>, <strong>branch_name</strong> (from <code>account</code>).</p>
+    <p style="margin-top:.5rem">But customer and account are not directly linked! We need the <code>depositor</code> table as a <strong>bridge</strong> between them.</p>
+    <div class="flow-diagram">
+      <div class="flow-box" style="background:rgba(59,130,246,0.15);border-color:var(--accent);color:var(--accent2)">customer</div>
+      <div class="flow-arrow">→ customer_id →</div>
+      <div class="flow-box" style="background:rgba(139,92,246,0.15);border-color:var(--purple);color:var(--purple2)">depositor</div>
+      <div class="flow-arrow">→ account_number →</div>
+      <div class="flow-box" style="background:rgba(245,158,11,0.15);border-color:var(--orange);color:var(--orange2)">account</div>
+    </div>`
+  },
+  {
+    title: 'Step 2: First JOIN — customer ⟗ depositor',
+    content: `<p>First, we join <code>customer</code> with <code>depositor</code> on <code>customer_id</code>. This pairs each customer with their depositor entries.</p>
+    <pre class="sql" style="margin:.75rem 0">${hl("SELECT *\nFROM customer c\nINNER JOIN depositor d\n  ON c.customer_id = d.customer_id;")}</pre>
+    <p>This gives us 7 rows — only customers who have deposits.</p>
+    <div id="t4-intermediate1"></div>`
+  },
+  {
+    title: 'Step 3: Second JOIN — (result) ⟗ account',
+    content: `<p>Now we take the result from Step 2 and join it with <code>account</code> on <code>account_number</code>. This brings in balance and branch_name.</p>
+    <pre class="sql" style="margin:.75rem 0">${hl("SELECT *\nFROM (customer c\n  INNER JOIN depositor d\n    ON c.customer_id = d.customer_id)\nINNER JOIN account a\n  ON d.account_number = a.account_number;")}</pre>
+    <p>Each depositor row now gets matched with its account details.</p>
+    <div id="t4-intermediate2"></div>`
+  },
+  {
+    title: 'Step 4: Select only the columns we need',
+    content: `<p>The full join has many columns. We only need 5 specific columns from the result:</p>
+    <pre class="sql" style="margin:.75rem 0">${hl("SELECT c.customer_name, c.customer_city,\n       a.account_number, a.balance, a.branch_name\nFROM (customer c\n  INNER JOIN depositor d\n    ON c.customer_id = d.customer_id)\nINNER JOIN account a\n  ON d.account_number = a.account_number;")}</pre>
+    <div id="t4-final-result"></div>`
+  },
+  {
+    title: 'Step 5: How the data flows — visual trace',
+    content: `<p>Let's trace one row through the entire query to understand the flow:</p>
+    <div class="info-box" style="font-size:.82rem">
+      <strong>Tracing customer Johnson (C-226):</strong><br><br>
+      1. <strong>customer</strong> table: C-226, Johnson, Alma, Palo Alto<br>
+      2. <strong>depositor</strong> table: C-226 has TWO entries → A-101 and A-201<br>
+      3. <strong>account</strong> table: A-101 → Downtown, $500 | A-201 → Brighton, $900<br>
+      4. <strong>Result:</strong> Johnson appears TWICE — once for each account!
+    </div>
+    <div id="t4-trace-result"></div>`
+  }
+];
+
+function initTask4() {
+  let fullSql = `SELECT c.customer_name, c.customer_city,
+       a.account_number, a.balance, a.branch_name
+FROM (customer c
+  INNER JOIN depositor d
+    ON c.customer_id = d.customer_id)
+INNER JOIN account a
+  ON d.account_number = a.account_number;`;
+  document.getElementById('task4-full-sql').innerHTML = hl(fullSql);
+
+  let altSql = `SELECT c.customer_name, c.customer_city,
+       a.account_number, a.balance, a.branch_name
+FROM customer c, depositor d, account a
+WHERE c.customer_id = d.customer_id
+  AND d.account_number = a.account_number;`;
+  document.getElementById('task4-alt-sql').innerHTML = hl(altSql);
+
+  renderT4Steps();
+}
+
+function renderT4Steps() {
+  let html = '';
+  t4Steps.forEach((s, i) => {
+    html += `<div class="t4-step ${i === t4Step ? 'active' : ''}" id="t4s-${i}">
+      <div class="t4-step-head" onclick="setT4Step(${i})">
+        <div class="t4-step-num">${i + 1}</div>
+        <div class="t4-step-title">${s.title}</div>
+        <div class="t4-arrow">▼</div>
+      </div>
+      <div class="t4-step-body">${s.content}</div>
+    </div>`;
+  });
+  document.getElementById('task4-steps').innerHTML = html;
+
+  document.getElementById('t4-step-info').textContent = `Step ${t4Step + 1} of ${t4Steps.length}`;
+  document.getElementById('t4-prev').disabled = t4Step <= 0;
+  document.getElementById('t4-next').disabled = t4Step >= t4Steps.length - 1;
+
+  renderT4Data();
+}
+
+function renderT4Data() {
+  let inter1 = [];
+  DB.customer.rows.forEach(c => {
+    DB.depositor.rows.forEach(d => {
+      if (c[0] === d[0]) {
+        inter1.push([c[0], c[1], c[2], c[3], d[0], d[1]]);
+      }
+    });
+  });
+
+  let inter2 = [];
+  inter1.forEach(r => {
+    DB.account.rows.forEach(a => {
+      if (r[5] === a[1]) {
+        inter2.push([r[0], r[1], r[2], r[3], r[5], a[0], a[1], a[2]]);
+      }
+    });
+  });
+
+  let finalResult = inter2.map(r => [r[1], r[3], r[6], r[7], r[5]]);
+
+  let el1 = document.getElementById('t4-intermediate1');
+  if (el1) {
+    let h = {};
+    inter1.forEach((r,i) => { if (r[1] === 'Johnson') h[i] = 'highlight-purple'; });
+    el1.innerHTML = renderTable(
+      ['c.customer_id','c.customer_name','c.customer_street','c.customer_city','d.customer_id','d.account_number'],
+      inter1, {highlights: h, label:'Intermediate Result (7 rows)', labelColor:'var(--purple)'}
+    );
+  }
+
+  let el2 = document.getElementById('t4-intermediate2');
+  if (el2) {
+    let h = {};
+    inter2.forEach((r,i) => { if (r[1] === 'Johnson') h[i] = 'highlight-purple'; });
+    el2.innerHTML = renderTable(
+      ['c.cust_id','c.name','c.street','c.city','d.acct_num','a.branch','a.acct_num','a.balance'],
+      inter2, {highlights: h, label:'Full Join Result (7 rows)', labelColor:'var(--green)'}
+    );
+  }
+
+  let el3 = document.getElementById('t4-final-result');
+  if (el3) {
+    el3.innerHTML = renderTable(
+      ['customer_name','customer_city','account_number','balance','branch_name'],
+      finalResult, {label:'Final Result (7 rows)', labelColor:'var(--purple)'}
+    );
+  }
+
+  let el4 = document.getElementById('t4-trace-result');
+  if (el4) {
+    let traced = finalResult.filter(r => r[0] === 'Johnson');
+    let h = {}; traced.forEach((r,i) => h[i] = 'highlight-purple');
+    el4.innerHTML = renderTable(
+      ['customer_name','customer_city','account_number','balance','branch_name'],
+      traced, {highlights: h, label:"Johnson's rows in final result", labelColor:'var(--purple)'}
+    );
+    el4.innerHTML += '<div style="margin-top:1rem">' + renderTable(
+      ['customer_name','customer_city','account_number','balance','branch_name'],
+      finalResult, {label:'Complete Final Result (7 rows)', labelColor:'var(--green)'}
+    ) + '</div>';
+  }
+
+  let resultArea = document.getElementById('t4-result-area');
+  if (t4Step >= 3) {
+    resultArea.innerHTML = '';
+  } else {
+    resultArea.innerHTML = '';
+  }
+}
+
+function setT4Step(i) {
+  if (t4Step === i) return;
+  t4Step = i;
+  renderT4Steps();
+}
+
+function t4StepPrev() {
+  if (t4Step > 0) { t4Step--; renderT4Steps(); document.getElementById('t4s-' + t4Step).scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+function t4StepNext() {
+  if (t4Step < t4Steps.length - 1) { t4Step++; renderT4Steps(); document.getElementById('t4s-' + t4Step).scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+
+// ===== INIT =====
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('show', window.scrollY > 400);
+});
+
+initTask1();
+initTask2();
+initTask3();
+initTask4();
+</script>
+</body>
+</html>
