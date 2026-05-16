@@ -977,7 +977,7 @@ const preferMap = {
   assignment: [/^final\s*assignment\s*mark\b/i],
   participation: [/particip/i, /\bcp\b/i, /class/i],
   mid: [/^midterm\s*\(\s*25\s*%\s*\)/i],
-  final: [/^final\s*mark/i],
+  final: [/final\s*exam\s*\(\s*25\s*%\s*\)/i, /^final\s*mark/i],
 };
 
 
@@ -1327,7 +1327,7 @@ const preferMap = {
       // For other categories: compute a score and show all row fields (excluding blank)
       const score = computeCategoryScore(ds, row, categoryKey);
       bigValue = Number.isFinite(score) ? score.toFixed(2).replace(/\.00$/,"") : "—";
-      bigCaption = cat?.label || "Marks";
+      bigCaption = categoryKey === "final" ? "Final Exam (25%)" : (cat?.label || "Marks");
 
       // Build tiles: show the most important-looking columns first
       const tiles = [];
