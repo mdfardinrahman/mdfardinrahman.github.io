@@ -582,7 +582,7 @@
       // Tabs (sheets) in your file:
       // (These names appear in your sheet UI)  :contentReference[oaicite:2]{index=2}
 sheets: {
-  total: { sheet: "Final_GradeSheet", range: "A9:L" },
+  total: { sheet: "Final_GradeSheet", range: "A9:K" },
 
   quiz: { 
     sheet: "Quiz_Gradesheet",
@@ -1080,13 +1080,9 @@ const preferMap = {
 
       if (categoryKey === "total"){
         // Use Final sheet data: total + grade if present
-        // const totalVal = pickFirstValue(ds.headers, row, [/^total\b/i, /\btotal\b/i]) || computeCategoryScore(ds, row, "total");
-        // const gradeVal = pickFirstValue(ds.headers, row, [/\bgrade\b/i]);
-        if (categoryKey === "total"){
-        // Use Final sheet data: total + grade if present
-        const totalVal = pickFirstValue(ds.headers, row, [/^total\b/i]) || computeCategoryScore(ds, row, "total");
+        const totalVal = pickFirstValue(ds.headers, row, [/^total\b/i, /\btotal\b/i]) || computeCategoryScore(ds, row, "total");
         const gradeVal = pickFirstValue(ds.headers, row, [/\bgrade\b/i]);
-        
+
         bigValue = isLikelyNumeric(totalVal) ? Number(totalVal).toFixed(2).replace(/\.00$/,"") : safeText(totalVal || "—");
         bigCaption = gradeVal ? `Grade: ${safeText(gradeVal)}` : "Total marks";
 
