@@ -486,6 +486,198 @@
       *{ animation:none !important; transition:none !important; }
       .orb{ display:none; }
     }
+
+    /* === Grade pill beside big total === */
+    .big-row{
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: flex-end;
+    }
+    .grade-pill{
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.5px;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.20), transparent 55%),
+        linear-gradient(135deg, rgba(99,102,241,.30), rgba(168,85,247,.30));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow:
+        0 10px 28px -8px rgba(99,102,241,.40),
+        inset 0 1px 0 rgba(255,255,255,.20);
+    }
+
+    /* === Theme selector === */
+    .theme-wrap{
+      display: inline-flex;
+      align-items: stretch;
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      background: linear-gradient(180deg, var(--card2), var(--card));
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow2);
+      overflow: hidden;
+      transition: border-color .2s var(--ease);
+    }
+    .theme-wrap:hover{ border-color: var(--stroke2); }
+    .theme-label{
+      display: flex;
+      align-items: center;
+      padding: 0 11px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-right: 1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      user-select: none;
+    }
+    .theme-select{
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      padding: 10px 28px 10px 12px;
+      cursor: pointer;
+      font-size: 12.8px;
+      font-weight: 650;
+      font-family: inherit;
+      outline: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position: calc(100% - 13px) 50%, calc(100% - 9px) 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+    .theme-select option { color:#111; background:#fff; }
+    body[data-theme] .theme-label{ background: rgba(0,0,0,.04); }
+
+    /* === Light Themes === */
+    body[data-theme="paper"]{
+      --bg0:#fafafa; --bg1:#eef0f4;
+      --card: rgba(15,18,30,.05); --card2: rgba(15,18,30,.08);
+      --stroke: rgba(15,18,30,.10); --stroke2: rgba(15,18,30,.20);
+      --text: rgba(15,18,30,.92); --muted: rgba(15,18,30,.60); --faint: rgba(15,18,30,.40);
+      --shadow: 0 20px 60px rgba(15,18,30,.10); --shadow2: 0 8px 24px rgba(15,18,30,.06);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(120,60,255,.10), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(50,170,255,.10), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="cream"]{
+      --bg0:#fff5e1; --bg1:#fae5c3;
+      --card: rgba(80,55,15,.05); --card2: rgba(80,55,15,.08);
+      --stroke: rgba(80,55,15,.12); --stroke2: rgba(80,55,15,.20);
+      --text: rgba(60,40,10,.92); --muted: rgba(60,40,10,.62); --faint: rgba(60,40,10,.42);
+      --shadow: 0 20px 60px rgba(120,80,20,.14); --shadow2: 0 8px 24px rgba(120,80,20,.08);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,180,90,.22), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(255,140,60,.14), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="sand"]{
+      --bg0:#fffceb; --bg1:#f9edb0;
+      --card: rgba(60,50,5,.05); --card2: rgba(60,50,5,.08);
+      --stroke: rgba(60,50,5,.12); --stroke2: rgba(60,50,5,.22);
+      --text: rgba(45,35,5,.92); --muted: rgba(45,35,5,.62); --faint: rgba(45,35,5,.42);
+      --shadow: 0 20px 60px rgba(160,120,20,.16); --shadow2: 0 8px 24px rgba(160,120,20,.10);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,220,100,.28), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(255,180,70,.18), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="mint"]{
+      --bg0:#eefbf3; --bg1:#d4f0df;
+      --card: rgba(5,60,30,.05); --card2: rgba(5,60,30,.08);
+      --stroke: rgba(5,60,30,.12); --stroke2: rgba(5,60,30,.22);
+      --text: rgba(5,50,25,.92); --muted: rgba(5,50,25,.60); --faint: rgba(5,50,25,.42);
+      --shadow: 0 20px 60px rgba(20,120,60,.14); --shadow2: 0 8px 24px rgba(20,120,60,.08);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(100,220,160,.25), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(60,200,220,.18), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="rose"]{
+      --bg0:#fff0f3; --bg1:#fbdde4;
+      --card: rgba(80,10,30,.05); --card2: rgba(80,10,30,.08);
+      --stroke: rgba(80,10,30,.12); --stroke2: rgba(80,10,30,.22);
+      --text: rgba(60,10,25,.92); --muted: rgba(60,10,25,.62); --faint: rgba(60,10,25,.42);
+      --shadow: 0 20px 60px rgba(220,80,120,.14); --shadow2: 0 8px 24px rgba(220,80,120,.08);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,150,180,.28), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(255,120,150,.18), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+
+    /* Hide orbs on light themes (they don't blend well) */
+    body[data-theme] .orb{ display:none; }
+
+    /* Light-theme overrides for elements with hard-coded white tints */
+    body[data-theme] .btn,
+    body[data-theme] .action{
+      background: linear-gradient(180deg, var(--card2), var(--card));
+    }
+    body[data-theme] .card .hd{
+      background: linear-gradient(180deg, var(--card), transparent);
+      border-bottom-color: var(--stroke);
+    }
+    body[data-theme] .card .hd h2{ color: var(--text); }
+    body[data-theme] input{
+      background: var(--card);
+      border-color: var(--stroke2);
+      color: var(--text);
+    }
+    body[data-theme] input::placeholder{ color: var(--faint); }
+    body[data-theme] .action:hover{ border-color: var(--stroke2); }
+    body[data-theme] .action.active{
+      background: var(--card2);
+      border-color: var(--stroke2);
+    }
+    body[data-theme] .sep{ background: var(--stroke); }
+    body[data-theme] .badge{
+      background: var(--card);
+      border-color: var(--stroke);
+    }
+    body[data-theme] .tile,
+    body[data-theme] table,
+    body[data-theme] .msg{
+      background: var(--card);
+      border-color: var(--stroke);
+    }
+    body[data-theme] th{
+      background: var(--card2);
+      color: var(--muted);
+      border-bottom-color: var(--stroke);
+    }
+    body[data-theme] td{ color: var(--text); }
+    body[data-theme] th, body[data-theme] td{ border-bottom-color: var(--stroke); }
+    body[data-theme] .pill{ background: var(--card); }
+    body[data-theme] .grade-pill{
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.45), transparent 55%),
+        linear-gradient(135deg, rgba(99,102,241,.20), rgba(168,85,247,.20));
+      border-color: rgba(99,102,241,.25);
+      box-shadow:
+        0 8px 22px -6px rgba(99,102,241,.25),
+        inset 0 1px 0 rgba(255,255,255,.40);
+    }
+    body[data-theme] .skeleton{
+      background: linear-gradient(90deg, var(--card), var(--card2), var(--card));
+      background-size: 220% 100%;
+      border-color: var(--stroke);
+    }
   </style>
 </head>
 
@@ -508,6 +700,17 @@
         <div class="pill" title="Live connection status">
           <span class="dot" id="statusDot"></span>
           <span id="statusText">Preparing…</span>
+        </div>
+        <div class="theme-wrap" title="Theme">
+          <span class="theme-label">Theme</span>
+          <select class="theme-select" id="themeSelect" aria-label="Theme">
+            <option value="dark">🌙 Dark</option>
+            <option value="paper">📄 Paper</option>
+            <option value="cream">🥛 Cream</option>
+            <option value="sand">🌾 Light Yellow</option>
+            <option value="mint">🍃 Mint</option>
+            <option value="rose">🌸 Rose</option>
+          </select>
         </div>
         <button class="btn" id="refreshBtn" type="button" title="Refresh data from Google Sheet">
           <span aria-hidden="true">↻</span> Refresh
@@ -582,7 +785,7 @@
       // Tabs (sheets) in your file:
       // (These names appear in your sheet UI)  :contentReference[oaicite:2]{index=2}
 sheets: {
-  total: { sheet: "Final_GradeSheet", range: "A9:K" },
+  total: { sheet: "Final_GradeSheet", range: "A9:L" },
 
   quiz: { 
     sheet: "Quiz_Gradesheet",
@@ -901,7 +1104,7 @@ const preferMap = {
       els.resultArea.innerHTML = `<div class="msg ${kind || ""}">${escapeHtml(text)}</div>`;
     }
 
-    function renderResult({ title, studentName, studentId, bigValue, bigCaption, tiles, table }){
+    function renderResult({ title, studentName, studentId, bigValue, bigCaption, bigBadge, tiles, table }){
       els.resultTitle.textContent = title;
       els.resultHint.textContent = studentId ? `Showing results for ID: ${studentId}` : "Waiting for input…";
 
@@ -936,7 +1139,10 @@ const preferMap = {
             <div class="id">Student ID: <b>${escapeHtml(studentId || "")}</b></div>
           </div>
           <div class="score">
-            <div class="big">${escapeHtml(bigValue)}</div>
+            <div class="big-row">
+              ${bigBadge ? `<div class="grade-pill">${escapeHtml(bigBadge)}</div>` : ""}
+              <div class="big">${escapeHtml(bigValue)}</div>
+            </div>
             <div class="cap">${escapeHtml(bigCaption || "")}</div>
           </div>
         </div>
@@ -1080,11 +1286,11 @@ const preferMap = {
 
       if (categoryKey === "total"){
         // Use Final sheet data: total + grade if present
-        const totalVal = pickFirstValue(ds.headers, row, [/^total\b/i, /\btotal\b/i]) || computeCategoryScore(ds, row, "total");
-        const gradeVal = pickFirstValue(ds.headers, row, [/\bgrade\b/i]);
+        const totalVal = pickFirstValue(ds.headers, row, [/^total\b/i]) || computeCategoryScore(ds, row, "total");
+        const gradeVal = pickFirstValue(ds.headers, row, [/\bgrades?\b/i]);
 
         bigValue = isLikelyNumeric(totalVal) ? Number(totalVal).toFixed(2).replace(/\.00$/,"") : safeText(totalVal || "—");
-        bigCaption = gradeVal ? `Grade: ${safeText(gradeVal)}` : "Total marks";
+        bigCaption = "Total marks";
 
         // Show breakdown tiles
         const q = pickFirstValue(ds.headers, row, [/\bquiz\b/i]) || "—";
@@ -1098,12 +1304,12 @@ const preferMap = {
           studentId,
           bigValue,
           bigCaption,
+          bigBadge: gradeVal ? safeText(gradeVal) : "",
           tiles: [
             { k: "Quiz", v: safeText(q) },
             { k: "Assignment", v: safeText(a) },
             { k: "Mid", v: safeText(m) },
-            { k: "Final", v: safeText(f) },
-            ...(gradeVal ? [{ k: "Grade", v: safeText(gradeVal) }] : [])
+            { k: "Final", v: safeText(f) }
           ],
           table: {
             headers: ["Field", "Value"],
@@ -1217,7 +1423,25 @@ const preferMap = {
       });
     }
 
+    const THEME_KEY = "marks_portal_theme";
+    function applyTheme(t){
+      if (!t || t === "dark") document.body.removeAttribute("data-theme");
+      else document.body.setAttribute("data-theme", t);
+      try { localStorage.setItem(THEME_KEY, t || "dark"); } catch(_){}
+    }
+    function initTheme(){
+      let t = "paper";
+      try { t = localStorage.getItem(THEME_KEY) || "paper"; } catch(_){}
+      applyTheme(t);
+      const sel = document.getElementById("themeSelect");
+      if (sel){
+        sel.value = t;
+        sel.addEventListener("change", e => applyTheme(e.target.value));
+      }
+    }
+
     async function boot(){
+      initTheme();
       renderActions();
       wireEvents();
 
