@@ -1430,8 +1430,8 @@ const preferMap = {
       try { localStorage.setItem(THEME_KEY, t || "dark"); } catch(_){}
     }
     function initTheme(){
-      let t = "paper";
-      try { t = localStorage.getItem(THEME_KEY) || "paper"; } catch(_){}
+      let t = "dark";
+      try { t = localStorage.getItem(THEME_KEY) || "dark"; } catch(_){}
       applyTheme(t);
       const sel = document.getElementById("themeSelect");
       if (sel){
