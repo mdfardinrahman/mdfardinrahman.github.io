@@ -1,0 +1,1468 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Marks Portal</title>
+  <meta name="theme-color" content="#0b1020" />
+
+  <style>
+    :root{
+      --bg0:#070A12;
+      --bg1:#0b1020;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.09);
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --faint: rgba(255,255,255,.50);
+      --good: #35d07f;
+      --warn: #ffcc66;
+      --bad:  #ff5d73;
+
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+
+      --r: 18px;
+      --r2: 14px;
+
+      --pad: 18px;
+      --pad2: 14px;
+
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 700px at 10% 10%, rgba(120,60,255,.25), transparent 55%),
+                  radial-gradient(900px 600px at 90% 25%, rgba(50,220,255,.18), transparent 50%),
+                  radial-gradient(900px 700px at 50% 95%, rgba(80,255,160,.12), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1) 60%, #050711);
+      overflow-x:hidden;
+    }
+
+    /* Floating orbs */
+    .orb{
+      position: fixed;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      filter: blur(42px);
+      opacity: .32;
+      pointer-events:none;
+      mix-blend-mode: screen;
+      animation: drift 14s var(--ease) infinite alternate;
+    }
+    .orb.one{ left:-140px; top:-140px; background: radial-gradient(circle at 30% 30%, rgba(160,90,255,.95), rgba(160,90,255,0)); }
+    .orb.two{ right:-180px; top:40px; background: radial-gradient(circle at 40% 40%, rgba(70,220,255,.9), rgba(70,220,255,0)); animation-duration: 17s; }
+    .orb.three{ left:20%; bottom:-220px; background: radial-gradient(circle at 40% 40%, rgba(90,255,170,.85), rgba(90,255,170,0)); animation-duration: 19s; }
+
+    @keyframes drift{
+      from{ transform: translate3d(0,0,0) scale(1); }
+      to{ transform: translate3d(40px, 20px, 0) scale(1.06); }
+    }
+
+    /* Layout */
+    .wrap{
+      width: min(1100px, 92vw);
+      margin: 28px auto 46px;
+      position: relative;
+      z-index: 2;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .brand{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+    }
+
+    .logo{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), transparent 52%),
+        linear-gradient(135deg, rgba(160,90,255,.95), rgba(70,220,255,.85));
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      position: relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.25) 50%, transparent 70%);
+      transform: rotate(20deg);
+      animation: shine 3.6s var(--ease) infinite;
+    }
+    @keyframes shine{
+      0%{ transform: translateX(-35%) rotate(20deg); opacity:.0; }
+      25%{ opacity:.55; }
+      55%{ opacity:.0; }
+      100%{ transform: translateX(35%) rotate(20deg); opacity:.0; }
+    }
+
+    .brand h1{
+      font-size: 16px;
+      margin: 0;
+      letter-spacing: .2px;
+      font-weight: 760;
+      line-height: 1.15;
+    }
+    .brand p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.8px;
+      line-height: 1.1;
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow2);
+      color: var(--muted);
+      font-size: 12.6px;
+      user-select:none;
+    }
+    .dot{
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--warn);
+      box-shadow: 0 0 0 4px rgba(255,204,102,.14);
+      flex: 0 0 auto;
+    }
+    .dot.ok{
+      background: var(--good);
+      box-shadow: 0 0 0 4px rgba(53,208,127,.14);
+    }
+    .dot.bad{
+      background: var(--bad);
+      box-shadow: 0 0 0 4px rgba(255,93,115,.14);
+    }
+
+    .btn{
+      appearance:none;
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(12px);
+      transition: transform .15s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+      font-weight: 650;
+      font-size: 12.8px;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: var(--stroke2); }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 390px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    }
+    .card .hd h2{
+      margin:0;
+      font-size: 13.4px;
+      letter-spacing:.2px;
+      font-weight: 760;
+      color: rgba(255,255,255,.90);
+    }
+    .card .bd{
+      padding: 16px;
+    }
+
+    /* Input */
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .label-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hint{
+      color: var(--muted);
+      font-size: 12.2px;
+    }
+
+    .input-wrap{
+      position: relative;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    input{
+      width: 100%;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.20);
+      color: var(--text);
+      font-size: 15px;
+      outline:none;
+      transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+    }
+    input::placeholder{ color: rgba(255,255,255,.38); }
+    input:focus{
+      border-color: rgba(120,180,255,.45);
+      box-shadow: 0 0 0 4px rgba(120,180,255,.14);
+    }
+
+    .mini{
+      font-size: 12.2px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    /* Action buttons grid */
+    .actions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 420px){
+      .actions{ grid-template-columns: 1fr; }
+    }
+
+    .action{
+      text-align:left;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      cursor:pointer;
+      color: var(--text);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      transition: transform .15s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+      position: relative;
+      overflow:hidden;
+      min-height: 68px;
+    }
+    .action:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .action:active{ transform: translateY(0px) scale(.99); }
+    .action.active{
+      border-color: rgba(120,180,255,.50);
+      box-shadow: 0 0 0 4px rgba(120,180,255,.14), var(--shadow2);
+    }
+    .action .t{
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .action .name{
+      font-weight: 780;
+      font-size: 13.2px;
+      letter-spacing: .2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .action .sub{
+      color: var(--muted);
+      font-size: 12.2px;
+      line-height: 1.2;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      flex: 0 0 auto;
+      font-size: 16px;
+    }
+
+    /* Results */
+    .hero{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .who{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      min-width: 220px;
+    }
+    .who .nm{
+      font-size: 16.2px;
+      font-weight: 820;
+      letter-spacing:.2px;
+    }
+    .who .id{
+      color: var(--muted);
+      font-size: 12.6px;
+    }
+
+    .score{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap: 4px;
+      min-width: 180px;
+    }
+    .score .big{
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      line-height: 1;
+    }
+    .score .cap{
+      color: var(--muted);
+      font-size: 12.4px;
+      text-align:right;
+    }
+
+    .sep{
+      margin: 14px 0;
+      height: 1px;
+      background: rgba(255,255,255,.10);
+    }
+
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 520px){
+      .kv{ grid-template-columns: 1fr; }
+      .score{ align-items:flex-start; }
+    }
+
+    .tile{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      padding: 12px;
+      overflow:hidden;
+    }
+    .tile .k{
+      color: var(--muted);
+      font-size: 12.1px;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tile .v{
+      font-size: 14.4px;
+      font-weight: 780;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow:hidden;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+    }
+    th, td{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align:left;
+      font-size: 12.8px;
+    }
+    th{
+      color: rgba(255,255,255,.78);
+      font-weight: 760;
+      background: rgba(255,255,255,.05);
+      position: sticky;
+      top:0;
+    }
+    tr:last-child td{ border-bottom:none; }
+    td{ color: rgba(255,255,255,.88); }
+
+    .msg{
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .msg.warn{ border-color: rgba(255,204,102,.35); box-shadow: 0 0 0 4px rgba(255,204,102,.10); }
+    .msg.bad{ border-color: rgba(255,93,115,.35); box-shadow: 0 0 0 4px rgba(255,93,115,.10); }
+
+    .skeleton{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.12), rgba(255,255,255,.05));
+      background-size: 220% 100%;
+      animation: shimmer 1.1s linear infinite;
+      height: 14px;
+      margin-top: 10px;
+    }
+    @keyframes shimmer{
+      0%{ background-position: 0% 0; }
+      100%{ background-position: 220% 0; }
+    }
+
+    footer{
+      margin-top: 16px;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      text-align:center;
+      line-height: 1.35;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      .orb{ display:none; }
+    }
+
+    /* === Grade pill beside big total === */
+    .big-row{
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: flex-end;
+    }
+    .grade-pill{
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.5px;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.20), transparent 55%),
+        linear-gradient(135deg, rgba(99,102,241,.30), rgba(168,85,247,.30));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow:
+        0 10px 28px -8px rgba(99,102,241,.40),
+        inset 0 1px 0 rgba(255,255,255,.20);
+    }
+
+    /* === Theme selector === */
+    .theme-wrap{
+      display: inline-flex;
+      align-items: stretch;
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      background: linear-gradient(180deg, var(--card2), var(--card));
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow2);
+      overflow: hidden;
+      transition: border-color .2s var(--ease);
+    }
+    .theme-wrap:hover{ border-color: var(--stroke2); }
+    .theme-label{
+      display: flex;
+      align-items: center;
+      padding: 0 11px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-right: 1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      user-select: none;
+    }
+    .theme-select{
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      padding: 10px 28px 10px 12px;
+      cursor: pointer;
+      font-size: 12.8px;
+      font-weight: 650;
+      font-family: inherit;
+      outline: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position: calc(100% - 13px) 50%, calc(100% - 9px) 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+    .theme-select option { color:#111; background:#fff; }
+    body[data-theme] .theme-label{ background: rgba(0,0,0,.04); }
+
+    /* === Light Themes === */
+    body[data-theme="paper"]{
+      --bg0:#fafafa; --bg1:#eef0f4;
+      --card: rgba(15,18,30,.05); --card2: rgba(15,18,30,.08);
+      --stroke: rgba(15,18,30,.10); --stroke2: rgba(15,18,30,.20);
+      --text: rgba(15,18,30,.92); --muted: rgba(15,18,30,.60); --faint: rgba(15,18,30,.40);
+      --shadow: 0 20px 60px rgba(15,18,30,.10); --shadow2: 0 8px 24px rgba(15,18,30,.06);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(120,60,255,.10), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(50,170,255,.10), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="cream"]{
+      --bg0:#fff5e1; --bg1:#fae5c3;
+      --card: rgba(80,55,15,.05); --card2: rgba(80,55,15,.08);
+      --stroke: rgba(80,55,15,.12); --stroke2: rgba(80,55,15,.20);
+      --text: rgba(60,40,10,.92); --muted: rgba(60,40,10,.62); --faint: rgba(60,40,10,.42);
+      --shadow: 0 20px 60px rgba(120,80,20,.14); --shadow2: 0 8px 24px rgba(120,80,20,.08);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,180,90,.22), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(255,140,60,.14), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="sand"]{
+      --bg0:#fffceb; --bg1:#f9edb0;
+      --card: rgba(60,50,5,.05); --card2: rgba(60,50,5,.08);
+      --stroke: rgba(60,50,5,.12); --stroke2: rgba(60,50,5,.22);
+      --text: rgba(45,35,5,.92); --muted: rgba(45,35,5,.62); --faint: rgba(45,35,5,.42);
+      --shadow: 0 20px 60px rgba(160,120,20,.16); --shadow2: 0 8px 24px rgba(160,120,20,.10);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,220,100,.28), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(255,180,70,.18), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="mint"]{
+      --bg0:#eefbf3; --bg1:#d4f0df;
+      --card: rgba(5,60,30,.05); --card2: rgba(5,60,30,.08);
+      --stroke: rgba(5,60,30,.12); --stroke2: rgba(5,60,30,.22);
+      --text: rgba(5,50,25,.92); --muted: rgba(5,50,25,.60); --faint: rgba(5,50,25,.42);
+      --shadow: 0 20px 60px rgba(20,120,60,.14); --shadow2: 0 8px 24px rgba(20,120,60,.08);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(100,220,160,.25), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(60,200,220,.18), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    body[data-theme="rose"]{
+      --bg0:#fff0f3; --bg1:#fbdde4;
+      --card: rgba(80,10,30,.05); --card2: rgba(80,10,30,.08);
+      --stroke: rgba(80,10,30,.12); --stroke2: rgba(80,10,30,.22);
+      --text: rgba(60,10,25,.92); --muted: rgba(60,10,25,.62); --faint: rgba(60,10,25,.42);
+      --shadow: 0 20px 60px rgba(220,80,120,.14); --shadow2: 0 8px 24px rgba(220,80,120,.08);
+      background:
+        radial-gradient(1200px 700px at 10% 10%, rgba(255,150,180,.28), transparent 55%),
+        radial-gradient(900px 600px at 90% 25%, rgba(255,120,150,.18), transparent 50%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+
+    /* Hide orbs on light themes (they don't blend well) */
+    body[data-theme] .orb{ display:none; }
+
+    /* Light-theme overrides for elements with hard-coded white tints */
+    body[data-theme] .btn,
+    body[data-theme] .action{
+      background: linear-gradient(180deg, var(--card2), var(--card));
+    }
+    body[data-theme] .card .hd{
+      background: linear-gradient(180deg, var(--card), transparent);
+      border-bottom-color: var(--stroke);
+    }
+    body[data-theme] .card .hd h2{ color: var(--text); }
+    body[data-theme] input{
+      background: var(--card);
+      border-color: var(--stroke2);
+      color: var(--text);
+    }
+    body[data-theme] input::placeholder{ color: var(--faint); }
+    body[data-theme] .action:hover{ border-color: var(--stroke2); }
+    body[data-theme] .action.active{
+      background: var(--card2);
+      border-color: var(--stroke2);
+    }
+    body[data-theme] .sep{ background: var(--stroke); }
+    body[data-theme] .badge{
+      background: var(--card);
+      border-color: var(--stroke);
+    }
+    body[data-theme] .tile,
+    body[data-theme] table,
+    body[data-theme] .msg{
+      background: var(--card);
+      border-color: var(--stroke);
+    }
+    body[data-theme] th{
+      background: var(--card2);
+      color: var(--muted);
+      border-bottom-color: var(--stroke);
+    }
+    body[data-theme] td{ color: var(--text); }
+    body[data-theme] th, body[data-theme] td{ border-bottom-color: var(--stroke); }
+    body[data-theme] .pill{ background: var(--card); }
+    body[data-theme] .grade-pill{
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.45), transparent 55%),
+        linear-gradient(135deg, rgba(99,102,241,.20), rgba(168,85,247,.20));
+      border-color: rgba(99,102,241,.25);
+      box-shadow:
+        0 8px 22px -6px rgba(99,102,241,.25),
+        inset 0 1px 0 rgba(255,255,255,.40);
+    }
+    body[data-theme] .skeleton{
+      background: linear-gradient(90deg, var(--card), var(--card2), var(--card));
+      background-size: 220% 100%;
+      border-color: var(--stroke);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+  <div class="orb three"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Marks Portal</h1>
+          <p>Enter your Student ID → choose a category</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div class="pill" title="Live connection status">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Preparing…</span>
+        </div>
+        <div class="theme-wrap" title="Theme">
+          <span class="theme-label">Theme</span>
+          <select class="theme-select" id="themeSelect" aria-label="Theme">
+            <option value="dark">🌙 Dark</option>
+            <option value="paper">📄 Paper</option>
+            <option value="cream">🥛 Cream</option>
+            <option value="sand">🌾 Light Yellow</option>
+            <option value="mint">🍃 Mint</option>
+            <option value="rose">🌸 Rose</option>
+          </select>
+        </div>
+        <button class="btn" id="refreshBtn" type="button" title="Refresh data from Google Sheet">
+          <span aria-hidden="true">↻</span> Refresh
+        </button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Left -->
+      <section class="card">
+        <div class="hd">
+          <h2>Student Lookup</h2>
+          <span class="hint" id="lastSync">Not synced yet</span>
+        </div>
+        <div class="bd">
+          <div class="field">
+            <div class="label-row">
+              <div class="hint">Student ID</div>
+              <div class="hint">Example: 20202020</div>
+            </div>
+
+            <div class="input-wrap">
+              <input id="studentIdInput" inputmode="numeric" autocomplete="off" placeholder="Type your student ID…" />
+              <button class="btn mini" id="clearBtn" type="button" title="Clear input">Clear</button>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="hint" style="margin-bottom:10px;">Choose what you want to view</div>
+            <div class="actions" id="actions"></div>
+
+            <div class="sep"></div>
+
+            <!-- <div class="msg" id="privacyNote">
+              <b>Note:</b> This page reads marks from the Google Sheet link you provided. If the sheet is “viewable by link”, students can check their marks using ID.
+            </div> -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Right -->
+      <section class="card">
+        <div class="hd">
+          <h2 id="resultTitle">Results</h2>
+          <span class="hint" id="resultHint">Waiting for input…</span>
+        </div>
+        <div class="bd" id="resultArea">
+          <div class="msg">Enter your Student ID on the left, then click one of the options.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- <footer>
+      Auto-sync runs periodically. If the sheet permissions change to private, this page won’t be able to load marks.
+    </footer> -->
+  </div>
+
+  <script>
+    /***********************
+     * CONFIG — edit if needed
+     ***********************/
+    const CONFIG = {
+      // Your spreadsheet link:
+      spreadsheetUrl: "https://docs.google.com/spreadsheets/d/1pn3ilT5TVOY_txdDEOF7maiPVEaqUGb6/",
+
+      // Message the user asked for (kept exactly):
+      idNotFoundMessage: "Student ID no found",
+
+      // How often to auto-refresh (ms):
+      autoRefreshMs: 5 * 60 * 1000, // 5 minutes
+
+      // Tabs (sheets) in your file:
+      // (These names appear in your sheet UI)  :contentReference[oaicite:2]{index=2}
+sheets: {
+  total: { sheet: "Final_GradeSheet", range: "A9:L" },
+
+  quiz: { 
+    sheet: "Quiz_Gradesheet",
+    range: "A9:G"   // 🔥 header starts at row 9
+  },
+
+  assignment: { 
+    sheet: "Assignment_Gradesheet",
+    range: "A9:Z"
+  },
+
+  participation: { 
+    sheet: "Summary",
+    range: "A9:Z"
+  },
+
+  mid: { 
+    sheet: "Midterm_GradeSheet",
+    range: "A9:Z"
+  },
+
+  final: { 
+    sheet: "Final_Exam",
+    range: "A9:Z"
+  },
+},
+
+      // UI categories
+      categories: [
+        { key: "total", label: "Total Marks", sub: "Overall + grade (if available)", icon: "Σ" },
+        { key: "quiz", label: "Quiz Marks", sub: "Quiz breakdown / total", icon: "📝" },
+        { key: "assignment", label: "Assignment Marks", sub: "Assignments breakdown / total", icon: "📚" },
+        { key: "participation", label: "Class Participation", sub: "If present in Summary", icon: "🤝" },
+        { key: "mid", label: "Mid Marks", sub: "Midterm marks", icon: "📊" },
+        { key: "final", label: "Final Marks", sub: "Final exam marks", icon: "🎓" },
+      ],
+    };
+
+    /***********************
+     * Helpers
+     ***********************/
+    const $ = (sel) => document.querySelector(sel);
+
+    function extractSpreadsheetId(url){
+      const m = String(url).match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      return m ? m[1] : null;
+    }
+
+    function fmtTime(d){
+      try{
+        return new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute:"2-digit", second:"2-digit" }).format(d);
+      }catch{
+        return d.toLocaleTimeString();
+      }
+    }
+
+    function normalizeId(v){
+      if (v === null || v === undefined) return "";
+      const s = String(v).trim();
+      // prefer digits if present
+      const digits = s.replace(/[^\d]/g, "");
+      return digits || s;
+    }
+
+    function isEmptyCell(v){
+      return v === null || v === undefined || String(v).trim() === "";
+    }
+
+    function safeText(v){
+      if (v === null || v === undefined) return "";
+      return String(v);
+    }
+
+    function isLikelyNumeric(v){
+      if (v === null || v === undefined) return false;
+      if (typeof v === "number") return Number.isFinite(v);
+      const s = String(v).trim();
+      return /^-?\d+(\.\d+)?$/.test(s);
+    }
+
+    function tryParseGviz(text){
+      // gviz response looks like: /*O_o*/ google.visualization.Query.setResponse({...});
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      if (start === -1 || end === -1 || end <= start) throw new Error("No JSON found in GViz response.");
+      const jsonStr = text.slice(start, end + 1);
+      return JSON.parse(jsonStr);
+    }
+
+    function buildDatasetFromGviz(gvizJson){
+      const table = gvizJson?.table;
+      if (!table?.cols || !table?.rows) throw new Error("Invalid GViz table.");
+
+      // Build raw matrix with column count = table.cols.length
+      const colCount = table.cols.length;
+
+      const rawRows = table.rows.map(r => {
+        const cells = r.c || [];
+        const row = new Array(colCount).fill("");
+        for (let i = 0; i < colCount; i++){
+          const cell = cells[i];
+          if (!cell) { row[i] = ""; continue; }
+          // Prefer formatted value if present
+          const v = (cell.f !== undefined && cell.f !== null) ? cell.f : cell.v;
+          row[i] = (v === null || v === undefined) ? "" : v;
+        }
+        return row;
+      });
+
+      // Detect header row: find first row containing "id" + ("name" optional)
+      const headerRowIndex = rawRows.findIndex(row => {
+        const joined = row.map(x => safeText(x).toLowerCase()).join(" | ");
+        return joined.includes("id") && (joined.includes("name") || joined.includes("student"));
+      });
+
+      let headers = table.cols.map((c, i) => (c.label || c.id || `Col${i+1}`).trim());
+      let dataRows = rawRows;
+
+      if (headerRowIndex >= 0){
+        const hdr = rawRows[headerRowIndex].map(x => safeText(x).trim());
+        headers = hdr.map((h, i) => h || (table.cols[i]?.id || `Col${i+1}`));
+
+        // ensure unique headers
+        const seen = new Map();
+        headers = headers.map(h => {
+          const key = h || "Column";
+          const n = seen.get(key) || 0;
+          seen.set(key, n+1);
+          return n === 0 ? key : `${key} (${n+1})`;
+        });
+
+        dataRows = rawRows.slice(headerRowIndex + 1);
+      }
+
+      // Guess ID + Name column indexes
+      const idIndex = guessColumnIndex(headers, [/^id\b/i, /\bid\b/i, /student\s*id/i]);
+      const nameIndex = guessColumnIndex(headers, [/^name\b/i, /\bname\b/i]);
+
+      // Index rows by student ID
+      const byId = new Map();
+      for (const row of dataRows){
+        const idVal = normalizeId(row[idIndex]);
+        if (!idVal) continue;
+        // avoid indexing obvious non-student rows
+        if (!/^\d{5,}$/.test(idVal)) continue;
+        byId.set(idVal, row);
+      }
+
+      return { headers, rows: dataRows, idIndex, nameIndex, byId };
+    }
+
+    function guessColumnIndex(headers, patterns){
+      const lower = headers.map(h => safeText(h).toLowerCase());
+      // exact-ish search
+      for (let i=0; i<headers.length; i++){
+        for (const re of patterns){
+          if (re.test(headers[i])) return i;
+        }
+      }
+      // fallback: contains "id" / "name"
+      const idLike = lower.findIndex(h => h.includes("id"));
+      if (patterns.some(p => String(p).includes("id")) && idLike >= 0) return idLike;
+      const nameLike = lower.findIndex(h => h.includes("name"));
+      if (patterns.some(p => String(p).includes("name")) && nameLike >= 0) return nameLike;
+
+      // final fallback
+      return 0;
+    }
+
+    function pickFirstValue(headers, row, patterns){
+      for (let i=0; i<headers.length; i++){
+        const h = safeText(headers[i]).toLowerCase();
+        if (patterns.some(re => re.test(h))){
+          const v = row[i];
+          if (!isEmptyCell(v)) return v;
+        }
+      }
+      return "";
+    }
+
+    function computeCategoryScore(dataset, row, categoryKey){
+      // If there is an obvious total column, use it; otherwise sum numerics.
+      const headersLower = dataset.headers.map(h => safeText(h).toLowerCase());
+
+      // special preference columns by category
+const preferMap = {
+  total: [/^total\b/i],
+  quiz: [/^total\s*quiz\s*mark\s*n-?1\s*\(\s*10\s*%\s*\)$/i],
+  // quiz: [/^total\s*quiz\s*mark\s*n-?2\b/i],
+  assignment: [/^final\s*assignment\s*mark\b/i],
+  participation: [/particip/i, /\bcp\b/i, /class/i],
+  mid: [/^midterm\s*\(\s*25\s*%\s*\)/i],
+  final: [/final\s*exam\s*\(\s*25\s*%\s*\)/i, /^final\s*mark/i],
+};
+
+
+      const prefers = preferMap[categoryKey] || [];
+      if (prefers.length){
+        const v = pickFirstValue(dataset.headers, row, prefers.map(re => new RegExp(re.source, "i")));
+        if (!isEmptyCell(v) && isLikelyNumeric(v)) return Number(v);
+      }
+
+      // Otherwise sum numeric cells excluding ID/Name
+      let sum = 0;
+      for (let i=0; i<row.length; i++){
+        if (i === dataset.idIndex || i === dataset.nameIndex) continue;
+        const h = headersLower[i] || "";
+        // skip columns that look like grade/suffix
+        if (h.includes("grade") || h.includes("suffix")) continue;
+
+        const v = row[i];
+        if (isLikelyNumeric(v)) sum += Number(v);
+      }
+      return sum;
+    }
+
+    /***********************
+     * Data fetch via GViz
+     ***********************/
+    async function fetchSheetGViz({ spreadsheetId, sheetName, range }){
+      // Build URL
+      // GViz supports "sheet=" and also "range=" A1 notation  :contentReference[oaicite:3]{index=3}
+      const base = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?`;
+      const params = new URLSearchParams();
+      if (sheetName) params.set("sheet", sheetName);
+      if (range) params.set("range", range);
+      // tq can be blank to return all
+      params.set("tq", "select *");
+      // cache-buster
+      params.set("_", String(Date.now()));
+
+      const url = base + params.toString();
+
+      const res = await fetch(url, { cache: "no-store" });
+      const text = await res.text();
+
+      // If sheet became private, Google may return HTML sign-in page
+      if (!text.includes("google.visualization.Query.setResponse")){
+        throw new Error("Unexpected response. (Is the sheet public/viewable by link?)");
+      }
+
+      const json = tryParseGviz(text);
+      return buildDatasetFromGviz(json);
+    }
+
+    /***********************
+     * UI + State
+     ***********************/
+    const state = {
+      spreadsheetId: extractSpreadsheetId(CONFIG.spreadsheetUrl),
+      datasets: new Map(), // key -> dataset
+      syncing: false,
+      lastSync: null,
+      lastError: null,
+      activeCategory: "total",
+    };
+
+    const els = {
+      actions: $("#actions"),
+      studentIdInput: $("#studentIdInput"),
+      clearBtn: $("#clearBtn"),
+      refreshBtn: $("#refreshBtn"),
+      statusDot: $("#statusDot"),
+      statusText: $("#statusText"),
+      lastSync: $("#lastSync"),
+      resultTitle: $("#resultTitle"),
+      resultHint: $("#resultHint"),
+      resultArea: $("#resultArea"),
+    };
+
+    function setStatus(mode, text){
+      els.statusDot.classList.remove("ok","bad");
+      if (mode === "ok") els.statusDot.classList.add("ok");
+      else if (mode === "bad") els.statusDot.classList.add("bad");
+      els.statusText.textContent = text;
+    }
+
+    function renderActions(){
+      els.actions.innerHTML = "";
+      for (const c of CONFIG.categories){
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "action" + (c.key === state.activeCategory ? " active" : "");
+        b.dataset.key = c.key;
+        b.innerHTML = `
+          <div class="t">
+            <div class="name">${escapeHtml(c.label)}</div>
+            <div class="sub">${escapeHtml(c.sub)}</div>
+          </div>
+          <div class="badge" aria-hidden="true">${escapeHtml(c.icon)}</div>
+        `;
+        b.addEventListener("click", () => {
+          state.activeCategory = c.key;
+          renderActions();
+          showCategoryForCurrentId();
+        });
+        els.actions.appendChild(b);
+      }
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[m]));
+    }
+
+    function renderLoading(){
+      els.resultArea.innerHTML = `
+        <div class="msg">Loading marks…</div>
+        <div class="skeleton" style="width:60%"></div>
+        <div class="skeleton" style="width:85%"></div>
+        <div class="skeleton" style="width:72%"></div>
+      `;
+    }
+
+    function renderMessage(text, kind){
+      els.resultArea.innerHTML = `<div class="msg ${kind || ""}">${escapeHtml(text)}</div>`;
+    }
+
+    function renderResult({ title, studentName, studentId, bigValue, bigCaption, bigBadge, tiles, table }){
+      els.resultTitle.textContent = title;
+      els.resultHint.textContent = studentId ? `Showing results for ID: ${studentId}` : "Waiting for input…";
+
+      const tilesHtml = (tiles && tiles.length)
+        ? `<div class="kv">
+            ${tiles.map(t => `
+              <div class="tile">
+                <div class="k">${escapeHtml(t.k)}</div>
+                <div class="v">${escapeHtml(t.v)}</div>
+              </div>
+            `).join("")}
+          </div>`
+        : "";
+
+      const tableHtml = (table && table.rows && table.rows.length)
+        ? `<table>
+            <thead><tr>
+              ${table.headers.map(h => `<th>${escapeHtml(h)}</th>`).join("")}
+            </tr></thead>
+            <tbody>
+              ${table.rows.map(r => `
+                <tr>${r.map(cell => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>
+              `).join("")}
+            </tbody>
+          </table>`
+        : "";
+
+      els.resultArea.innerHTML = `
+        <div class="hero">
+          <div class="who">
+            <div class="nm">${escapeHtml(studentName || "Student")}</div>
+            <div class="id">Student ID: <b>${escapeHtml(studentId || "")}</b></div>
+          </div>
+          <div class="score">
+            <div class="big-row">
+              ${bigBadge ? `<div class="grade-pill">${escapeHtml(bigBadge)}</div>` : ""}
+              <div class="big">${escapeHtml(bigValue)}</div>
+            </div>
+            <div class="cap">${escapeHtml(bigCaption || "")}</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        ${tilesHtml}
+
+        ${tableHtml ? `<div class="sep"></div>` : ""}
+        ${tableHtml}
+      `;
+    }
+
+    async function syncAll(){
+      if (!state.spreadsheetId){
+        setStatus("bad", "Bad Sheet URL");
+        renderMessage("Spreadsheet URL is invalid. Please check CONFIG.spreadsheetUrl.", "bad");
+        return;
+      }
+
+      state.syncing = true;
+      state.lastError = null;
+      setStatus("warn", "Syncing…");
+      els.lastSync.textContent = "Syncing…";
+
+      // cache key
+      const cacheKey = "marks_portal_cache_v1_" + state.spreadsheetId;
+
+      const keys = Object.keys(CONFIG.sheets);
+      const results = new Map();
+
+      try{
+        // Fetch in parallel
+        await Promise.all(keys.map(async (k) => {
+          const spec = CONFIG.sheets[k];
+          const sheetName = spec.sheet;
+          const range = spec.range;
+
+          const ds = await fetchSheetGViz({
+            spreadsheetId: state.spreadsheetId,
+            sheetName,
+            range
+          });
+
+          results.set(k, ds);
+        }));
+
+        state.datasets = results;
+        state.lastSync = new Date();
+        setStatus("ok", "Live");
+        els.lastSync.textContent = "Last sync: " + fmtTime(state.lastSync);
+
+        // Save cache (lightweight)
+        const cacheObj = {
+          savedAt: state.lastSync.toISOString(),
+          datasets: {}
+        };
+        for (const [k, ds] of state.datasets.entries()){
+          cacheObj.datasets[k] = {
+            headers: ds.headers,
+            rows: ds.rows,
+            idIndex: ds.idIndex,
+            nameIndex: ds.nameIndex
+          };
+        }
+        localStorage.setItem(cacheKey, JSON.stringify(cacheObj));
+
+      }catch(err){
+        state.lastError = err;
+        setStatus("bad", "Offline / blocked");
+        els.lastSync.textContent = "Sync failed";
+
+        // Try cache fallback
+        try{
+          const raw = localStorage.getItem(cacheKey);
+          if (raw){
+            const cached = JSON.parse(raw);
+            const map = new Map();
+            for (const k of Object.keys(cached.datasets || {})){
+              const c = cached.datasets[k];
+              // Rebuild byId index
+              const byId = new Map();
+              for (const row of c.rows){
+                const idVal = normalizeId(row[c.idIndex]);
+                if (!idVal) continue;
+                if (!/^\d{5,}$/.test(idVal)) continue;
+                byId.set(idVal, row);
+              }
+              map.set(k, { ...c, byId });
+            }
+            state.datasets = map;
+            state.lastSync = cached.savedAt ? new Date(cached.savedAt) : null;
+            setStatus("warn", "Using cache");
+            els.lastSync.textContent = state.lastSync ? ("Cached: " + fmtTime(state.lastSync)) : "Using cached data";
+          }
+        }catch(_){}
+
+        // Don’t overwrite current results if student already viewing
+      }finally{
+        state.syncing = false;
+      }
+
+      showCategoryForCurrentId();
+    }
+
+    function getDatasetForCategory(categoryKey){
+      return state.datasets.get(categoryKey) || null;
+    }
+
+    function showCategoryForCurrentId(){
+      const categoryKey = state.activeCategory;
+      const cat = CONFIG.categories.find(c => c.key === categoryKey);
+      const studentId = normalizeId(els.studentIdInput.value);
+
+      if (!studentId){
+        els.resultTitle.textContent = "Results";
+        els.resultHint.textContent = "Waiting for input…";
+        renderMessage("Enter your Student ID on the left, then click one of the options.", "");
+        return;
+      }
+
+      const ds = getDatasetForCategory(categoryKey);
+
+      // If we don't have data yet
+      if (!ds){
+        renderLoading();
+        return;
+      }
+
+      const row = ds.byId.get(studentId);
+      if (!row){
+        renderMessage(CONFIG.idNotFoundMessage, "bad");
+        return;
+      }
+
+      const studentName = ds.nameIndex >= 0 ? safeText(row[ds.nameIndex]) : "";
+
+      // Big number / caption
+      let bigValue = "";
+      let bigCaption = "";
+
+      if (categoryKey === "total"){
+        // Use Final sheet data: total + grade if present
+        const totalVal = pickFirstValue(ds.headers, row, [/^total\b/i]) || computeCategoryScore(ds, row, "total");
+        const gradeVal = pickFirstValue(ds.headers, row, [/\bgrades?\b/i]);
+
+        bigValue = isLikelyNumeric(totalVal) ? Number(totalVal).toFixed(2).replace(/\.00$/,"") : safeText(totalVal || "—");
+        bigCaption = "Total marks";
+
+        // Show breakdown tiles
+        const q = pickFirstValue(ds.headers, row, [/\bquiz\b/i]) || "—";
+        const a = pickFirstValue(ds.headers, row, [/\bassig\b/i, /\bassignment\b/i]) || "—";
+        const m = pickFirstValue(ds.headers, row, [/\bmid\b/i, /\bmidterm\b/i]) || "—";
+        const f = pickFirstValue(ds.headers, row, [/\bfinal\b/i, /\bexam\b/i]) || "—";
+
+        renderResult({
+          title: cat?.label || "Total Marks",
+          studentName,
+          studentId,
+          bigValue,
+          bigCaption,
+          bigBadge: gradeVal ? safeText(gradeVal) : "",
+          tiles: [
+            { k: "Quiz", v: safeText(q) },
+            { k: "Assignment", v: safeText(a) },
+            { k: "Mid", v: safeText(m) },
+            { k: "Final", v: safeText(f) }
+          ],
+          table: {
+            headers: ["Field", "Value"],
+            rows: ds.headers
+              .map((h, i) => [safeText(h), safeText(row[i])])
+              .filter(([h,v]) => !isEmptyCell(h) && !isEmptyCell(v))
+              // reduce noisy non-mark columns if too big
+              .slice(0, 30)
+          }
+        });
+
+        return;
+      }
+
+      // For other categories: compute a score and show all row fields (excluding blank)
+      const score = computeCategoryScore(ds, row, categoryKey);
+      bigValue = Number.isFinite(score) ? score.toFixed(2).replace(/\.00$/,"") : "—";
+      bigCaption = categoryKey === "final" ? "Final Exam (25%)" : (cat?.label || "Marks");
+
+      // Build tiles: show the most important-looking columns first
+      const tiles = [];
+      const importantPatterns = {
+        quiz: [/total\s*quiz\s*mark\s*n-?2/i, /\bquiz\s*\d+\b/i, /\bquiz\b/i],
+        assignment: [/\btotal\b/i, /\bassig/i, /\bassignment\b/i],
+        mid: [/\btotal\b/i, /\bmid/i, /\bmidterm\b/i],
+        final: [/\btotal\b/i, /\bfinal\b/i, /\bexam\b/i],
+        participation: [/\bparticip\b/i, /\bcp\b/i, /\bclass\b/i],
+        
+      }[categoryKey] || [];
+
+      for (let i=0; i<ds.headers.length; i++){
+        if (i === ds.idIndex || i === ds.nameIndex) continue;
+        const h = safeText(ds.headers[i]);
+        const v = row[i];
+        if (isEmptyCell(h) || isEmptyCell(v)) continue;
+        if (importantPatterns.some(re => re.test(h.toLowerCase()))){
+          tiles.push({ k: h, v: safeText(v) });
+        }
+      }
+
+      // If participation sheet doesn't contain participation-ish fields, show a warning
+      if (categoryKey === "participation"){
+        const hasPart = ds.headers.some(h => /\bparticip\b|\bcp\b|\bclass\b/i.test(safeText(h)));
+        if (!hasPart){
+          renderResult({
+            title: cat?.label || "Class Participation",
+            studentName,
+            studentId,
+            bigValue: "—",
+            bigCaption: "Not available in this sheet",
+            tiles: [],
+            table: {
+              headers: ["Info", "Value"],
+              rows: [
+                ["Message", "Class participation column not detected in 'Summary' tab."]
+              ]
+            }
+          });
+          return;
+        }
+      }
+
+      // Table of all non-empty values
+      const rowsForTable = [];
+      for (let i=0; i<ds.headers.length; i++){
+        if (i === ds.idIndex) continue;
+        const h = safeText(ds.headers[i]).trim();
+        const v = row[i];
+        if (isEmptyCell(h) || isEmptyCell(v)) continue;
+        rowsForTable.push([h, safeText(v)]);
+      }
+
+      renderResult({
+        title: cat?.label || "Marks",
+        studentName,
+        studentId,
+        bigValue,
+        bigCaption,
+        tiles: tiles.slice(0, 10),
+        table: {
+          headers: ["Field", "Value"],
+          rows: rowsForTable.slice(0, 60)
+        }
+      });
+    }
+
+    /***********************
+     * Boot
+     ***********************/
+    function wireEvents(){
+      els.clearBtn.addEventListener("click", () => {
+        els.studentIdInput.value = "";
+        showCategoryForCurrentId();
+        els.studentIdInput.focus();
+      });
+
+      els.refreshBtn.addEventListener("click", async () => {
+        renderLoading();
+        await syncAll();
+      });
+
+      els.studentIdInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter"){
+          showCategoryForCurrentId();
+        }
+      });
+
+      els.studentIdInput.addEventListener("input", () => {
+        // live update if a category is already selected
+        showCategoryForCurrentId();
+      });
+    }
+
+    const THEME_KEY = "marks_portal_theme";
+    function applyTheme(t){
+      if (!t || t === "dark") document.body.removeAttribute("data-theme");
+      else document.body.setAttribute("data-theme", t);
+      try { localStorage.setItem(THEME_KEY, t || "dark"); } catch(_){}
+    }
+    function initTheme(){
+      let t = "dark";
+      try { t = localStorage.getItem(THEME_KEY) || "dark"; } catch(_){}
+      applyTheme(t);
+      const sel = document.getElementById("themeSelect");
+      if (sel){
+        sel.value = t;
+        sel.addEventListener("change", e => applyTheme(e.target.value));
+      }
+    }
+
+    async function boot(){
+      initTheme();
+      renderActions();
+      wireEvents();
+
+      if (!state.spreadsheetId){
+        setStatus("bad", "Bad Sheet URL");
+        renderMessage("Spreadsheet URL is invalid. Please check CONFIG.spreadsheetUrl.", "bad");
+        return;
+      }
+
+      setStatus("warn", "Syncing…");
+      renderLoading();
+      await syncAll();
+
+      // Auto refresh
+      setInterval(() => {
+        syncAll();
+      }, CONFIG.autoRefreshMs);
+    }
+
+    boot();
+  </script>
+</body>
+</html>
